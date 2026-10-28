@@ -117,3 +117,58 @@
     aspect-ratio:4/3;
   }
 }
+
+
+/* Editorial Work consolidation and evidence-based interactions (no gamification). */
+.work-intro{padding-block:var(--space-5) var(--space-4)}
+.work-intro h1{margin-bottom:var(--space-2)}
+.work-intro .lede{max-width:54ch}
+.work-jump-nav{position:sticky;top:76px;z-index:38;background:rgba(247,246,242,.98);border-block:1px solid var(--line)}
+.work-jump-nav__inner{display:flex;gap:clamp(.8rem,2.4vw,2.4rem);align-items:center;justify-content:space-between;flex-wrap:wrap;padding-block:.85rem}
+.work-jump-nav a{color:var(--ink-soft);font-size:var(--step--1);font-weight:600;text-decoration:none;border-bottom:1px solid transparent;line-height:1.3}
+.work-jump-nav a:hover,.work-jump-nav a:focus-visible{color:var(--teal);border-bottom-color:currentColor}
+.work-page [id]{scroll-margin-top:175px}
+.portfolio-project{padding-bottom:var(--space-4)}
+.project-divider{padding-top:var(--space-6);border-top:2px solid var(--navy-900)}
+.project-divider__index{max-width:none;font-size:var(--step--1);font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--teal)}
+.work-page .portfolio-project .case-hero{padding-block:var(--space-4) var(--space-3)}
+.work-page .case-hero .consolidated-case-title{font-size:var(--step-4);margin-bottom:var(--space-2)}
+.project-context{padding-bottom:var(--space-4)}
+.work-lens-tags{display:flex;flex-wrap:wrap;list-style:none;gap:.4rem;padding:0;margin:0 0 var(--space-3)}
+.work-lens-tags li{font-size:.73rem;letter-spacing:.06em;border:1px solid var(--line);padding:.3rem .7rem;border-radius:999px;color:var(--ink-soft)}
+.collaboration-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-4);border-block:1px solid var(--line);padding-block:var(--space-3)}
+.collaboration-grid p{margin:0;max-width:52ch;font-size:var(--step--1);color:var(--ink-soft)}
+.collaboration-grid .collaboration-label{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);font-weight:600;margin-bottom:.45rem}
+.portfolio-project .case-section{padding-block:var(--space-5)}
+.portfolio-project .case-section:last-child{padding-bottom:var(--space-4)}
+.work-page .role-tabs button:focus-visible,.work-page .phase-tabs button:focus-visible{outline:var(--focus);outline-offset:3px}
+.flight-explorer{margin-top:var(--space-5);border-top:1px solid var(--line);padding-top:var(--space-4)}
+.flight-explorer .case-section__head{margin-bottom:var(--space-3)}
+.phase-tabs{display:flex;flex-wrap:wrap;gap:.45rem;margin-bottom:var(--space-3)}
+.phase-tabs button{font:inherit;font-size:var(--step--1);color:var(--ink-soft);text-align:left;cursor:pointer;border:1px solid var(--line);border-radius:var(--radius);padding:.75rem 1rem;background:var(--paper);min-height:56px;flex:1 1 150px}
+.phase-tabs button span{display:block;color:var(--teal);font-size:.72rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase}
+.phase-tabs button[aria-selected=true]{border-color:var(--teal);box-shadow:inset 0 0 0 1px var(--teal);background:var(--blue-wash);color:var(--ink)}
+.flight-panel{display:grid;gap:var(--space-4);grid-template-columns:minmax(0,.55fr) minmax(0,1.45fr);padding:var(--space-3);background:var(--paper);border:1px solid var(--line);border-radius:var(--radius)}
+.flight-panel[hidden],.lens-results[hidden]{display:none}
+.flight-panel__intro h4{font-family:var(--font-display);font-size:var(--step-2);font-weight:500}
+.flight-panel .role-facts{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-3)}
+.flight-panel .role-facts dd{font-size:var(--step--1)}
+.role-panel .role-facts dt{color:var(--navy-700)}
+.lens-section{border-top:1px solid var(--line)}
+.lens-section .section-head{margin-bottom:var(--space-4)}
+.lens-options{display:flex;flex-wrap:wrap;gap:.6rem}
+.lens-option{font:inherit;font-size:var(--step--1);font-weight:600;min-height:44px;cursor:pointer;border:1px solid var(--line);border-radius:999px;padding:.55rem 1rem;color:var(--ink-soft);background:var(--paper)}
+.lens-option[aria-pressed=true]{color:#fff;background:var(--navy-700);border-color:var(--navy-700)}
+.lens-results{margin-top:var(--space-3);padding:var(--space-3) 0;border-top:1px solid var(--line)}
+.lens-results__label{font-size:var(--step--1);font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--teal)}
+.lens-results ul{display:flex;list-style:none;flex-wrap:wrap;gap:var(--space-2) var(--space-4);margin:0;padding:0}
+.lens-results .text-link{min-height:40px;font-size:var(--step--1)}
+/* Future Decision Moments may use the existing .decision treatment; none are added in this pass. */
+@media(max-width:750px){
+ .work-jump-nav{position:static}
+ .work-jump-nav__inner{justify-content:flex-start;gap:.75rem 1.2rem}
+ .work-page [id]{scroll-margin-top:125px}
+ .collaboration-grid,.flight-panel{grid-template-columns:1fr}
+ .flight-panel .role-facts{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
