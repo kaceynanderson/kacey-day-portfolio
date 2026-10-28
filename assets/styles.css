@@ -858,5 +858,9 @@
 .work-page .media-pair img,.home-page .work-card__visual img{height:auto;object-fit:contain}
 @media(max-width:760px){.work-page .role-evidence{margin-bottom:var(--space-3)}}
 
+/* Two authentic Parent portal views live in the existing role selector. */
+.work-page .role-evidence-stack{display:grid;gap:var(--space-3);min-width:0}
+.work-page .role-evidence-stack .role-evidence{margin-bottom:0}
+
 /* AA-visible keyboard focus against dark navy surfaces. */
 .site-header :focus-visible,.hero :focus-visible,.site-footer :focus-visible,.section--navy :focus-visible{outline-color:var(--blue-soft)}
