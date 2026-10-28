@@ -279,3 +279,40 @@
  .about-page .about-values__grid{grid-template-columns:1fr}
  .about-page .about-values__grid h3{max-width:28ch}
 }
+
+
+/* FLIGHT: real screenshot comparison. Preserve image proportions without cropping. */
+.flight-iteration-comparison{
+ display:grid;
+ grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:clamp(1rem,2.5vw,2rem);
+ margin-top:var(--space-4);
+ align-items:start;
+}
+.flight-iteration-comparison__item{
+ min-width:0;
+ margin:0;
+ border:1px solid var(--line);
+ border-radius:var(--radius);
+ overflow:hidden;
+ background:var(--paper);
+}
+.flight-iteration-comparison__label{
+ display:flex;flex-direction:column;gap:.2rem;
+ padding:1rem 1.25rem;border-bottom:1px solid var(--line);
+}
+.flight-iteration-comparison__label span{font-weight:650;color:var(--ink);}
+.flight-iteration-comparison__label small{color:var(--ink-soft);font-size:var(--step--1);}
+.flight-iteration-comparison__image{display:grid;place-items:center;padding:.55rem;background:var(--paper-warm);}
+.flight-iteration-comparison__image img{
+ display:block;width:100%;height:auto;max-width:100%;object-fit:contain;object-position:center;
+ border-radius:calc(var(--radius) / 2);
+}
+.flight-iteration-comparison__item figcaption{
+ margin:0;padding:1rem 1.25rem;
+ font-size:var(--step--1);color:var(--ink-soft);line-height:1.6;text-align:left;
+}
+.flight-iteration-comparison__note{margin-top:var(--space-3);text-align:center;}
+@media(max-width:760px){
+ .flight-iteration-comparison{grid-template-columns:1fr}
+}
