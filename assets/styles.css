@@ -463,3 +463,55 @@
   }
   .lens-results,.role-panel,.flight-panel,.approach-flow,.path{animation:none!important;transition:none!important}
 }
+
+
+/* Homepage editorial compression: responsive lens evidence cards and lighter preview copy. */
+.home-page .lens-section .lens-evidence-grid{
+ display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+ gap:clamp(.6rem,1.6vw,1.05rem);list-style:none;margin:0;padding:0
+}
+.home-page .lens-section .lens-evidence-grid li{min-width:0;margin:0}
+.home-page .lens-evidence-card{
+ display:flex;flex-direction:column;gap:.35rem;height:100%;min-height:106px;
+ padding:1rem 1.1rem;border:1px solid var(--line);border-top:2px solid var(--green);
+ border-radius:var(--radius);background:var(--paper);
+ color:var(--ink);text-decoration:none;
+ transition:border-color .2s ease,background-color .2s ease,transform .2s ease
+}
+.home-page .lens-evidence-card__title{
+ display:block;font-family:var(--font-display);font-size:clamp(1.05rem,1rem + .4vw,1.35rem);
+ font-weight:500;line-height:1.25
+}
+.home-page .lens-evidence-card__summary{
+ display:block;font-size:var(--step--1);line-height:1.5;color:var(--ink-soft)
+}
+.home-page .lens-evidence-card:hover,.home-page .lens-evidence-card:focus-visible{
+ border-color:var(--teal);background:var(--blue-wash)
+}
+.home-page .lens-evidence-card:focus-visible{outline:var(--focus);outline-offset:3px}
+.home-page .lens-section .lens-results{padding-bottom:0}
+.home-page .work-card--feature .work-card__title{
+ font-size:clamp(2.15rem,1.75rem + 1.85vw,3.45rem);
+ max-width:16ch
+}
+.home-page #how-i-work{padding-block:var(--space-5)}
+.home-page #how-i-work .section-head{margin-bottom:var(--space-3)}
+.home-page #how-i-work .principles{
+ column-gap:var(--space-4);row-gap:var(--space-3)
+}
+.home-page #how-i-work .principles li{padding-top:var(--space-2)}
+.home-page #how-i-work .principles p{
+ max-width:33ch;margin:0;color:var(--ink-soft);
+ font-size:var(--step--1);line-height:1.5
+}
+.home-page #how-i-work .actions{margin-top:var(--space-3)}
+@media(max-width:790px){
+ .home-page .lens-section .lens-evidence-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:540px){
+ .home-page .lens-section .lens-evidence-grid{grid-template-columns:1fr}
+ .home-page .lens-evidence-card{min-height:82px}
+}
+@media(prefers-reduced-motion:reduce){
+ .home-page .lens-evidence-card{transition:none;transform:none}
+}
