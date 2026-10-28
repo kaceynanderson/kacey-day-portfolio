@@ -515,3 +515,229 @@
 @media(prefers-reduced-motion:reduce){
  .home-page .lens-evidence-card{transition:none;transform:none}
 }
+
+
+/* Portfolio-wide tactile interaction pass — a subtle response to deliberate
+   exploration, not a new visual language or hover-only functionality. */
+.home-page .work-card,
+.home-page .lens-evidence-card,
+.work-page .card,
+.approach-page .card,
+.about-page .card,
+.work-page .track li,
+.work-page .flight-iteration-comparison__item,
+.work-page .figure__frame,
+.home-page .principles li,
+.approach-page .approach-principles li,
+.about-page .about-role,
+.about-page .about-path__detail{
+  transition:
+    background-color 260ms ease,
+    border-color 260ms ease,
+    box-shadow 300ms ease,
+    transform 300ms cubic-bezier(.2,.75,.25,1);
+}
+.home-page .work-card{
+  position:relative;
+  border-radius:var(--radius);
+  transition:background-color 260ms ease,border-color 260ms ease,
+    box-shadow 300ms ease,transform 300ms cubic-bezier(.2,.75,.25,1);
+}
+.home-page .lens-evidence-card,
+.work-page .card,
+.approach-page .card,
+.about-page .card,
+.work-page .track li{
+  position:relative;
+}
+.home-page .lens-evidence-card:focus-visible,
+.home-page .work-card:focus-within,
+.work-page .card:focus-within,
+.approach-page .card:focus-within,
+.about-page .card:focus-within{
+  border-color:var(--teal);
+  background-color:var(--blue-wash);
+  box-shadow:0 10px 28px rgba(7,26,43,.085),0 0 0 1px rgba(0,112,240,.12);
+}
+.home-page .work-card:focus-within{box-shadow:0 0 0 10px rgba(225,238,252,.35),0 10px 26px rgba(7,26,43,.07)}
+/* Color feedback for controls works even when motion is disabled. */
+.home-page .lens-option,
+.work-page .role-tabs button,
+.work-page .phase-tabs button,
+.work-page .work-jump-nav a,
+.site-header .nav a{
+  transition:background-color 230ms ease,border-color 230ms ease,
+             box-shadow 230ms ease,color 230ms ease,transform 230ms ease;
+}
+.home-page .lens-option:focus-visible,
+.work-page .role-tabs button:focus-visible,
+.work-page .phase-tabs button:focus-visible{
+  box-shadow:0 0 0 3px rgba(0,112,240,.18);
+}
+.home-page .lens-option[aria-pressed="true"],
+.work-page .role-tabs button[aria-selected="true"],
+.work-page .phase-tabs button[aria-selected="true"]{
+  box-shadow:0 2px 0 rgba(7,26,43,.10);
+}
+/* Make static information react as content without pretending to be a button. */
+.home-page .principles li,
+.approach-page .approach-principles li,
+.about-page .about-role,
+.about-page .about-path__detail{
+  border-radius:var(--radius);
+}
+@media(hover:hover) and (pointer:fine){
+  .home-page .lens-evidence-card:hover,
+  .work-page .card:hover,
+  .approach-page .card:hover,
+  .about-page .card:hover,
+  .work-page .track li:hover{
+    background-color:#EDF4FC;
+    border-color:#85B5DD;
+    box-shadow:0 14px 32px rgba(7,26,43,.105),0 0 0 1px rgba(0,112,240,.08);
+    transform:translateY(-4px);
+  }
+  .home-page .lens-evidence-card:hover{border-top-color:var(--green)}
+  .home-page .work-card:hover{
+    background-color:rgba(225,238,252,.35);
+    border-top-color:var(--green);
+    box-shadow:0 0 0 12px rgba(225,238,252,.33),0 12px 24px rgba(7,26,43,.065);
+    transform:translateY(-4px);
+  }
+  .home-page .work-card:hover .work-card__index{color:var(--navy-700)}
+  .home-page .work-card:hover .work-card__media{
+    box-shadow:0 8px 22px rgba(7,26,43,.10);
+  }
+  .home-page .principles li:hover,
+  .approach-page .approach-principles li:hover,
+  .about-page .about-role:hover,
+  .about-page .about-path__detail:hover{
+    background-color:rgba(225,238,252,.50);
+    border-color:var(--green);
+    box-shadow:0 0 0 10px rgba(225,238,252,.24);
+    transform:translateY(-3px);
+  }
+  .work-page .figure__frame:hover,
+  .work-page .flight-iteration-comparison__item:hover{
+    border-color:#85B5DD;
+    box-shadow:0 12px 28px rgba(7,26,43,.085);
+    transform:translateY(-3px);
+  }
+  .home-page .lens-option:hover:not([aria-pressed="true"]),
+  .work-page .role-tabs button:hover:not([aria-selected="true"]),
+  .work-page .phase-tabs button:hover:not([aria-selected="true"]){
+    background-color:var(--blue-wash);
+    border-color:var(--teal);
+    color:var(--navy-700);
+    box-shadow:0 6px 16px rgba(7,26,43,.075);
+    transform:translateY(-2px);
+  }
+  .work-page .work-jump-nav a:hover{
+    color:var(--teal);
+    transform:translateY(-2px);
+  }
+}
+/* On both mouse and keyboard, active selections remain easy to distinguish. */
+.work-page .phase-tabs button[aria-selected="true"]{
+  background-color:var(--blue-wash);
+}
+.home-page .lens-evidence-card__title{transition:color 220ms ease}
+.home-page .lens-evidence-card:is(:hover,:focus-visible) .lens-evidence-card__title{
+  color:var(--navy-700);
+}
+.home-page .work-card__media{transition:box-shadow 300ms ease}
+@media(prefers-reduced-motion:no-preference){
+  /* Elements are already rendered at high opacity: no content waits to appear.
+     Entrance is a restrained 12px settling motion, once per section. */
+  html.motion-enabled :is(
+    .home-page .lens-section .section-head,
+    .home-page .lens-options,
+    .home-page #featured .work-card,
+    .home-page #how-i-work .principles li,
+    .approach-page .approach-principles li,
+    .approach-page #capabilities .card,
+    .about-page .about-hero,
+    .about-page .about-path__detail,
+    .about-page .about-role,
+    .about-page .about-research-card,
+    .about-page .about-values__grid > *,
+    .work-page .portfolio-project > .case-section .case-section__head,
+    .work-page .portfolio-project > .case-section .card,
+    .work-page .flight-iteration-comparison__item
+  ).motion-pending{
+    opacity:.88;
+    transform:translateY(12px);
+    transition:opacity 560ms ease-out,
+               transform 560ms cubic-bezier(.2,.75,.25,1);
+  }
+  html.motion-enabled :is(
+    .home-page .lens-section .section-head,
+    .home-page .lens-options,
+    .home-page #featured .work-card,
+    .home-page #how-i-work .principles li,
+    .approach-page .approach-principles li,
+    .approach-page #capabilities .card,
+    .about-page .about-hero,
+    .about-page .about-path__detail,
+    .about-page .about-role,
+    .about-page .about-research-card,
+    .about-page .about-values__grid > *,
+    .work-page .portfolio-project > .case-section .case-section__head,
+    .work-page .portfolio-project > .case-section .card,
+    .work-page .flight-iteration-comparison__item
+  ).motion-pending.is-in-view{
+    opacity:1;
+    transform:none;
+  }
+  /* The evidence appears in a short, meaningful cascade after a lens choice. */
+  html.motion-enabled .lens-results:not([hidden]) .lens-evidence-card{
+    animation:evidence-card-enter 380ms cubic-bezier(.2,.75,.25,1) both;
+  }
+  html.motion-enabled .lens-results:not([hidden]) li:nth-child(2) .lens-evidence-card{animation-delay:55ms}
+  html.motion-enabled .lens-results:not([hidden]) li:nth-child(3) .lens-evidence-card{animation-delay:110ms}
+  @keyframes evidence-card-enter{
+    from{opacity:.50}
+    to{opacity:1}
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .home-page .work-card,
+  .home-page .lens-evidence-card,
+  .home-page .work-card__media,
+  .home-page .lens-evidence-card__title,
+  .home-page .lens-option,
+  .home-page .principles li,
+  .work-page .card,
+  .work-page .track li,
+  .work-page .flight-iteration-comparison__item,
+  .work-page .figure__frame,
+  .work-page .role-tabs button,
+  .work-page .phase-tabs button,
+  .work-page .work-jump-nav a,
+  .approach-page .card,
+  .approach-page .approach-principles li,
+  .about-page .card,
+  .about-page .about-role,
+  .about-page .about-path__detail,
+  .site-header .nav a{
+    animation:none!important;transition:none!important;transform:none!important;
+  }
+}
+
+/* Once a card has entered, hover feedback takes precedence over the one-time
+   scroll reveal. The same rule works without revealing new content. */
+@media (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
+ html.motion-enabled .home-page #featured .work-card.motion-pending.is-in-view:hover,
+ html.motion-enabled .home-page #how-i-work .principles li.motion-pending.is-in-view:hover,
+ html.motion-enabled .approach-page .approach-principles li.motion-pending.is-in-view:hover,
+ html.motion-enabled .approach-page #capabilities .card.motion-pending.is-in-view:hover,
+ html.motion-enabled .about-page .about-path__detail.motion-pending.is-in-view:hover,
+ html.motion-enabled .about-page .about-role.motion-pending.is-in-view:hover,
+ html.motion-enabled .about-page .about-research-card.motion-pending.is-in-view:hover,
+ html.motion-enabled .work-page .portfolio-project > .case-section .card.motion-pending.is-in-view:hover,
+ html.motion-enabled .work-page .flight-iteration-comparison__item.motion-pending.is-in-view:hover{
+   transform:translateY(-4px);
+   transition:transform 300ms cubic-bezier(.2,.75,.25,1),
+              box-shadow 300ms ease,background-color 260ms ease,border-color 260ms ease;
+ }
+}

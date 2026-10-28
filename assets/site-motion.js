@@ -29,7 +29,13 @@
   if (!('IntersectionObserver' in window) ||
       (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
   var targets=Array.prototype.slice.call(document.querySelectorAll(
-    '.home-page .path, .approach-page .approach-flow, .work-page .portfolio-project > .project-divider, .work-page .portfolio-project > .case-hero'
+    '.home-page .path, .approach-page .approach-flow, .work-page .portfolio-project > .project-divider, .work-page .portfolio-project > .case-hero, ' +
+    '.home-page .lens-section .section-head, .home-page .lens-options, .home-page #featured .work-card, ' +
+    '.home-page #how-i-work .principles li, .approach-page .approach-principles li, ' +
+    '.approach-page #capabilities .card, .about-page .about-hero, .about-page .about-path__detail, ' +
+    '.about-page .about-role, .about-page .about-research-card, .about-page .about-values__grid > *, ' +
+    '.work-page .portfolio-project > .case-section .case-section__head, ' +
+    '.work-page .portfolio-project > .case-section .card, .work-page .flight-iteration-comparison__item'
   ));
   if (!targets.length && !document.body.classList.contains('home-page')) return;
   document.documentElement.classList.add('motion-enabled');
