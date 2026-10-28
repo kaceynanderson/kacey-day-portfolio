@@ -741,3 +741,119 @@
               box-shadow 300ms ease,background-color 260ms ease,border-color 260ms ease;
  }
 }
+
+
+/* Submission quality pass: accessible evidence, responsive media, and honest affordances. */
+.home-page .work-card--no-visual{grid-template-columns:minmax(0,1fr)}
+.home-page .work-card--no-visual > div{max-width:75ch}
+.work-page .role-panel .role-facts{margin-top:0}
+.work-page .role-panel{min-width:0}
+.work-page .partner-quote{padding-top:var(--space-3)}
+.work-page .partner-quote blockquote{
+ margin:0;max-width:62ch;padding:1rem 1.3rem 1rem 1.6rem;
+ border-left:3px solid var(--green);font-family:var(--font-display);
+ font-size:var(--step-1);line-height:1.48;color:var(--ink)
+}
+.work-page .partner-quote cite{
+ display:block;margin-top:.7rem;font:600 var(--step--1) var(--font-body);
+ color:var(--ink-soft);font-style:normal
+}
+.work-page .comparison-notes{
+ display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+ gap:var(--space-3);margin:var(--space-4) 0;padding-top:var(--space-2);
+ border-top:1px solid var(--line)
+}
+.work-page .comparison-notes h4{
+ font-family:var(--font-body);font-size:var(--step--1);
+ font-weight:700;text-transform:uppercase;letter-spacing:.1em;
+ color:var(--teal);margin-bottom:.5rem
+}
+.work-page .comparison-notes p{font-size:var(--step--1);line-height:1.55;color:var(--ink-soft)}
+.work-page .selected-supporting{border-color:var(--line);background:transparent}
+.artifact-fullscreen{display:block;max-width:100%;border-radius:var(--radius)}
+.artifact-fullscreen img,.work-page .flight-iteration-comparison__image img{
+ display:block;max-width:100%;width:100%;height:auto;object-fit:contain;object-position:center
+}
+.artifact-fullscreen:focus-visible{outline:var(--focus);outline-offset:4px}
+@media(hover:hover) and (pointer:fine){
+ .artifact-fullscreen:hover{outline:2px solid var(--teal);outline-offset:3px}
+}
+.approach-page .tool-groups{
+ display:grid;grid-template-columns:1fr;gap:var(--space-3)
+}
+.approach-page .tool-group{padding-bottom:var(--space-2);border-bottom:1px solid var(--line)}
+.approach-page .tool-group h3{
+ font:600 var(--step--1) var(--font-body);
+ letter-spacing:.09em;text-transform:uppercase;color:var(--teal);margin-bottom:.35rem
+}
+.approach-page .tool-group p{font-size:var(--step--1);line-height:1.7;margin:0}
+.home-page .principles h3,.approach-page .approach-principles h3{
+ font-family:var(--font-body);font-size:var(--step--1);
+ font-weight:600;line-height:1.4;letter-spacing:0
+}
+.work-page .card h3,.work-page .compare h3{
+ font-family:var(--font-body);font-size:var(--step-1);line-height:1.36;font-weight:600
+}
+.about-single-ending{padding-block:var(--space-6);border-top:1px solid #25435D}
+.about-single-ending .case-section__head{display:flex;gap:var(--space-2);align-items:center;margin-bottom:var(--space-3)}
+.about-single-ending .case-section__num{color:var(--blue-soft)}
+.about-single-ending h2{max-width:22ch;font-size:var(--step-3)}
+.about-single-ending__intro{max-width:61ch;font-size:var(--step-1);color:#D9E6F2!important}
+.about-single-ending__contact{
+ padding-top:var(--space-4);margin-top:var(--space-5);
+ border-top:1px solid #36536B;scroll-margin-top:100px
+}
+.about-single-ending__contact>p:not(.eyebrow){max-width:60ch}
+.about-single-ending .text-link,.about-single-ending__contact nav a{color:#E8EEF4}
+.about-single-ending .about-contact__links{display:flex;flex-wrap:wrap;gap:var(--space-3);margin-top:var(--space-4)}
+.about-single-ending .about-contact__links a{
+ display:inline-flex;min-height:44px;align-items:center;
+ font-weight:600;text-underline-offset:.25em
+}
+@supports selector(:has(*)){
+ .work-page .case-grid--2:has(> :only-child){grid-template-columns:1fr}
+}
+@media(max-width:760px){
+ .work-page .comparison-notes{grid-template-columns:1fr;gap:var(--space-2)}
+ .work-page .comparison-notes > div{border-bottom:1px solid var(--line)}
+ .about-single-ending h2{max-width:30ch}
+}
+/* Static information should not masquerade as an actionable surface.
+   Retain entrances where allowed; remove hover elevation from non-controls. */
+@media(hover:hover) and (pointer:fine){
+ .home-page #how-i-work .principles li:hover,
+ .approach-page .approach-principles li:hover,
+ .about-page .about-role:hover,
+ .about-page .about-path__detail:hover,
+ .work-page .track li:hover,
+ .work-page .card:hover,
+ .approach-page .card:hover,
+ .about-page .card:hover,
+ .work-page .flight-iteration-comparison__item:hover,
+ .work-page .figure__frame:hover,
+ .home-page .work-card:hover{
+  transform:none;box-shadow:none;background-color:transparent;border-color:inherit
+ }
+ .home-page .work-card:hover{border-top-color:var(--green);background-color:transparent}
+ html.motion-enabled .home-page #featured .work-card.motion-pending.is-in-view:hover,
+ html.motion-enabled .home-page #how-i-work .principles li.motion-pending.is-in-view:hover,
+ html.motion-enabled .approach-page .approach-principles li.motion-pending.is-in-view:hover,
+ html.motion-enabled .approach-page #capabilities .card.motion-pending.is-in-view:hover,
+ html.motion-enabled .about-page .about-path__detail.motion-pending.is-in-view:hover,
+ html.motion-enabled .about-page .about-role.motion-pending.is-in-view:hover,
+ html.motion-enabled .about-page .about-research-card.motion-pending.is-in-view:hover,
+ html.motion-enabled .work-page .portfolio-project > .case-section .card.motion-pending.is-in-view:hover,
+ html.motion-enabled .work-page .flight-iteration-comparison__item.motion-pending.is-in-view:hover{
+  transform:none;box-shadow:none;background-color:transparent;border-color:inherit
+ }
+}
+/* The selectors above deliberately override the earlier decorative lift layer.
+   Actionable lens cards, buttons, and full-size artifact links retain focus feedback. */
+
+/* Authentic Lumavi evidence cropped to the relevant product interface. */
+.work-page .role-evidence{margin:0 0 var(--space-4);max-width:100%;min-width:0}
+.work-page .role-evidence img{display:block;width:100%;max-width:100%;height:auto;object-fit:contain;border:1px solid var(--line);border-radius:var(--radius)}
+.work-page .role-evidence figcaption{font-size:var(--step--1);line-height:1.55;color:var(--ink-soft);margin-top:.7rem;max-width:72ch}
+.work-page .media-pair{align-items:start}
+.work-page .media-pair img,.home-page .work-card__visual img{height:auto;object-fit:contain}
+@media(max-width:760px){.work-page .role-evidence{margin-bottom:var(--space-3)}}
