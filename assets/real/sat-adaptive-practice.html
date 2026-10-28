@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAT Adaptive Practice Prototype · Kacey Day (Anderson)</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,500;1,400&family=Fira+Code:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d1b2a;--surface:#162336;--surface-2:#1e2f45;--border:#2a3f5a;--text:#f0ebe0;--muted:#7a92a9;--gold:#d4a853;--goldl:#f0c96a;--teal:#2ec4b6;--amber:#ffaa2e;--correct:#4caf82;--wrong:#e05263;--easy:#4caf82;--medium:#ffaa2e;--hard:#e05263;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;line-height:1.6;}
+.screen{display:none;min-height:100vh;}
+.screen.active{display:flex;flex-direction:column;}
+
+/* INTRO */
+#screen-intro{align-items:center;justify-content:center;background:radial-gradient(ellipse at 30% 40%,#1a2f45 0%,var(--bg) 60%);}
+.intro-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:52px;max-width:720px;width:92%;text-align:center;box-shadow:0 32px 80px rgba(0,0,0,.5);}
+.badge{display:inline-block;background:linear-gradient(135deg,var(--gold),var(--goldl));color:var(--bg);font-family:'Fira Code',monospace;font-size:11px;font-weight:500;letter-spacing:2px;text-transform:uppercase;padding:6px 18px;border-radius:20px;margin-bottom:26px;}
+.ititle{font-family:'Playfair Display',serif;font-size:44px;font-weight:700;margin-bottom:10px;line-height:1.2;}
+.isub{color:var(--muted);font-size:15px;margin-bottom:32px;}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:28px;}
+.sbox{background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:14px 10px;text-align:center;}
+.sbox .sv{font-family:'Playfair Display',serif;font-size:24px;color:var(--gold);font-weight:700;}
+.sbox .sl{font-size:11px;color:var(--muted);font-family:'Fira Code',monospace;margin-top:2px;}
+.mod-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:28px;}
+.mcard{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:18px;text-align:left;}
+.mcard.rw{border-top:3px solid var(--teal);}
+.mcard.math{border-top:3px solid var(--amber);}
+.mcard .mn{font-family:'Playfair Display',serif;font-size:14px;font-weight:600;margin:6px 0 4px;}
+.mcard .mi{font-size:12px;color:var(--muted);font-family:'Fira Code',monospace;}
+.info{background:rgba(212,168,83,.08);border:1px solid rgba(212,168,83,.2);border-radius:8px;padding:14px 18px;font-size:13px;color:var(--muted);margin-bottom:30px;text-align:left;}
+.info strong{color:var(--gold);}
+.btn-go{background:linear-gradient(135deg,var(--gold),var(--goldl));color:var(--bg);border:none;border-radius:10px;padding:16px 52px;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:600;cursor:pointer;transition:all .2s;letter-spacing:.5px;}
+.btn-go:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(212,168,83,.3);}
+
+/* EXAM HEADER */
+.ehdr{background:var(--surface);border-bottom:1px solid var(--border);padding:11px 26px;display:flex;align-items:center;justify-content:space-between;gap:18px;position:sticky;top:0;z-index:10;flex-shrink:0;}
+.sec-lbl{font-family:'Fira Code',monospace;font-size:12px;letter-spacing:1px;color:var(--muted);white-space:nowrap;}
+.prog-wrap{flex:1;max-width:340px;}
+.prog-bg{background:var(--border);border-radius:4px;height:6px;overflow:hidden;}
+.prog-fill{background:linear-gradient(90deg,var(--teal),var(--gold));height:100%;border-radius:4px;transition:width .4s;}
+.prog-lbl{font-size:11px;color:var(--muted);font-family:'Fira Code',monospace;margin-top:4px;text-align:right;}
+.timer-box{display:flex;align-items:center;gap:7px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:7px 14px;white-space:nowrap;}
+.tval{font-family:'Fira Code',monospace;font-size:18px;font-weight:500;transition:color .3s;}
+.tval.warn{color:var(--medium);}
+.tval.urgent{color:var(--wrong);animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+
+/* EXAM BODY */
+.ebody{flex:1;display:grid;grid-template-columns:1fr 256px;max-width:1160px;margin:0 auto;width:100%;padding:26px 18px;gap:0;}
+.qpanel{padding-right:26px;}
+.qnum{font-family:'Fira Code',monospace;font-size:12px;color:var(--muted);letter-spacing:1px;margin-bottom:5px;}
+.dbadge{display:inline-block;font-family:'Fira Code',monospace;font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;padding:3px 10px;border-radius:20px;margin-bottom:16px;}
+.dbadge.easy{background:rgba(76,175,130,.15);color:var(--easy);border:1px solid rgba(76,175,130,.3);}
+.dbadge.medium{background:rgba(255,170,46,.12);color:var(--medium);border:1px solid rgba(255,170,46,.3);}
+.dbadge.hard{background:rgba(224,82,99,.12);color:var(--hard);border:1px solid rgba(224,82,99,.3);}
+.passage{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:8px;padding:16px 20px;margin-bottom:20px;}
+.plbl{font-family:'Fira Code',monospace;font-size:10px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:7px;}
+.ptxt{font-family:'IBM Plex Serif',serif;font-size:15px;line-height:1.85;color:#d0c9be;}
+.qtxt{font-family:'IBM Plex Serif',serif;font-size:17px;line-height:1.75;color:var(--text);margin-bottom:26px;white-space:pre-wrap;}
+.opts{display:flex;flex-direction:column;gap:9px;}
+.opt{display:flex;align-items:flex-start;gap:12px;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:13px 17px;cursor:pointer;transition:all .17s;text-align:left;width:100%;color:var(--text);}
+.opt:hover:not(.dis){border-color:var(--gold);background:rgba(212,168,83,.06);transform:translateX(2px);}
+.opt.sel{border-color:var(--gold);background:rgba(212,168,83,.1);}
+.olbl{width:25px;height:25px;border-radius:50%;background:var(--surface-2);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'Fira Code',monospace;font-size:11px;font-weight:500;flex-shrink:0;margin-top:1px;transition:all .17s;}
+.opt.sel .olbl{background:var(--gold);border-color:var(--gold);color:var(--bg);}
+.otxt{font-family:'IBM Plex Serif',serif;font-size:14px;line-height:1.6;}
+
+/* NAV PANEL */
+.npanel{border-left:1px solid var(--border);padding-left:22px;}
+.ntitle{font-family:'Fira Code',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;}
+.dots{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:18px;}
+.dot{width:26px;height:26px;border-radius:5px;border:1.5px solid var(--border);background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-family:'Fira Code',monospace;font-size:10px;cursor:pointer;transition:all .14s;color:var(--muted);}
+.dot:hover{border-color:var(--muted);}
+.dot.ans{background:rgba(212,168,83,.15);border-color:var(--gold);color:var(--gold);}
+.dot.cur{background:var(--gold);border-color:var(--gold);color:var(--bg);}
+.dot.flag{border-color:var(--wrong);}
+.legend{display:flex;flex-direction:column;gap:6px;margin-bottom:18px;}
+.li{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);}
+.ld{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+.nacts{display:flex;flex-direction:column;gap:8px;}
+.btn-flag{background:transparent;border:1.5px solid var(--border);border-radius:7px;padding:8px 13px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:all .17s;}
+.btn-flag:hover{border-color:var(--wrong);color:var(--wrong);}
+.btn-flag.on{border-color:var(--wrong);color:var(--wrong);background:rgba(224,82,99,.08);}
+.btn-prev{background:transparent;border:1.5px solid var(--border);border-radius:7px;padding:8px 13px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:all .17s;display:none;}
+.btn-prev:hover{border-color:var(--muted);color:var(--text);}
+.btn-next{background:linear-gradient(135deg,var(--gold),var(--goldl));border:none;border-radius:7px;padding:10px 13px;color:var(--bg);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;}
+.btn-next:hover{transform:translateY(-1px);box-shadow:0 5px 14px rgba(212,168,83,.3);}
+.btn-sub{background:linear-gradient(135deg,#4caf82,#3d9e72);border:none;border-radius:7px;padding:10px 13px;color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;display:none;}
+.btn-sub:hover{transform:translateY(-1px);}
+
+/* BREAK */
+#screen-break{align-items:center;justify-content:center;background:radial-gradient(ellipse at 70% 30%,#1a2f45 0%,var(--bg) 60%);}
+.bcard{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:48px;max-width:540px;width:92%;text-align:center;}
+.bicon{font-size:46px;margin-bottom:13px;}
+.btitle{font-family:'Playfair Display',serif;font-size:28px;font-weight:600;margin-bottom:6px;}
+.bsub{color:var(--muted);font-size:15px;margin-bottom:26px;}
+.bstats{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-bottom:22px;}
+.bst{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:15px 10px;}
+.bst .bv{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--gold);}
+.bst .bl{font-size:11px;font-family:'Fira Code',monospace;color:var(--muted);margin-top:2px;}
+.tbadge{display:inline-block;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:500;margin-bottom:22px;}
+.tbadge.hard{background:rgba(224,82,99,.12);color:var(--hard);border:1px solid rgba(224,82,99,.3);}
+.tbadge.easy{background:rgba(76,175,130,.12);color:var(--easy);border:1px solid rgba(76,175,130,.3);}
+
+/* RESULTS */
+#screen-results{background:radial-gradient(ellipse at 50% 0%,#1a2f45 0%,var(--bg) 50%);padding:42px 18px;overflow-y:auto;}
+.rinner{max-width:900px;margin:0 auto;}
+.rhdr{text-align:center;margin-bottom:40px;}
+.rtitle{font-family:'Playfair Display',serif;font-size:36px;font-weight:700;margin-bottom:6px;}
+.rsub{color:var(--muted);font-size:16px;}
+.shero{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:34px;text-align:center;margin-bottom:26px;position:relative;overflow:hidden;}
+.shero::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--teal),var(--gold),var(--amber));}
+.sbig{font-family:'Playfair Display',serif;font-size:72px;font-weight:700;color:var(--gold);line-height:1;}
+.sden{font-size:17px;color:var(--muted);margin-top:4px;margin-bottom:18px;}
+.pbar-bg{background:var(--border);border-radius:6px;height:10px;max-width:400px;margin:0 auto 9px;overflow:hidden;}
+.pbar-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--teal),var(--gold));transition:width 1s ease;}
+.plbl{color:var(--muted);font-size:14px;}
+.rgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:26px;}
+.rcard{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;}
+.rch{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.rind{width:4px;height:24px;border-radius:2px;flex-shrink:0;}
+.rind.rw{background:var(--teal);}
+.rind.math{background:var(--amber);}
+.rname{font-family:'Playfair Display',serif;font-size:17px;font-weight:600;}
+.rtrk{font-size:11px;font-family:'Fira Code',monospace;color:var(--muted);}
+.rscr{margin-left:auto;font-family:'Fira Code',monospace;font-size:19px;color:var(--gold);}
+.drows{display:flex;flex-direction:column;gap:8px;}
+.drow{display:flex;align-items:center;gap:8px;}
+.dlbl{font-size:12px;font-family:'Fira Code',monospace;width:56px;flex-shrink:0;}
+.dlbl.easy{color:var(--easy);}
+.dlbl.medium{color:var(--medium);}
+.dlbl.hard{color:var(--hard);}
+.dbg{flex:1;background:var(--border);border-radius:4px;height:7px;overflow:hidden;}
+.dfill{height:100%;border-radius:4px;transition:width .8s ease;}
+.dfill.easy{background:var(--easy);}
+.dfill.medium{background:var(--medium);}
+.dfill.hard{background:var(--hard);}
+.dcnt{font-size:12px;font-family:'Fira Code',monospace;color:var(--muted);width:36px;text-align:right;}
+.revsec{margin-bottom:26px;}
+.revtitle{font-family:'Playfair Display',serif;font-size:22px;font-weight:600;margin-bottom:14px;}
+.filts{display:flex;gap:7px;margin-bottom:13px;flex-wrap:wrap;}
+.fb{background:var(--surface-2);border:1.5px solid var(--border);border-radius:6px;padding:5px 12px;font-size:12px;font-family:'Fira Code',monospace;color:var(--muted);cursor:pointer;transition:all .14s;}
+.fb.on{border-color:var(--gold);color:var(--gold);background:rgba(212,168,83,.08);}
+.revlist{display:flex;flex-direction:column;gap:9px;}
+.ritem{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;}
+.ritem.ok{border-left:3px solid var(--correct);}
+.ritem.no{border-left:3px solid var(--wrong);}
+.rih{display:flex;align-items:center;gap:8px;margin-bottom:9px;flex-wrap:wrap;}
+.rqt{font-family:'IBM Plex Serif',serif;font-size:14px;line-height:1.6;color:#d0c9be;margin-bottom:7px;white-space:pre-wrap;}
+.rans{display:flex;gap:13px;font-size:12px;font-family:'Fira Code',monospace;flex-wrap:wrap;}
+.ya{color:var(--wrong);}
+.ya.ok{color:var(--correct);}
+.ca{color:var(--correct);}
+.rfooter{text-align:center;padding-top:10px;}
+.btn-re{background:transparent;border:1.5px solid var(--gold);border-radius:10px;padding:12px 32px;color:var(--gold);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;transition:all .2s;}
+.btn-re:hover{background:rgba(212,168,83,.08);transform:translateY(-1px);}
+@media(max-width:768px){
+  .ebody{grid-template-columns:1fr;}
+  .npanel{border-left:none;border-top:1px solid var(--border);padding-left:0;padding-top:18px;margin-top:18px;}
+  .qpanel{padding-right:0;}
+  .rgrid,.mod-grid,.stat-row{grid-template-columns:1fr 1fr;}
+  .ititle{font-size:30px;}
+  .intro-card{padding:30px 20px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════ INTRO ══════ -->
+<div id="screen-intro" class="screen active">
+  <div class="intro-card">
+    <div class="badge">🎓 Digital SAT · Full Length</div>
+    <h1 class="ititle">SAT Adaptive Exam</h1>
+    <p class="isub">98 questions · 134 minutes · Adaptive difficulty · Full score breakdown</p>
+    <div class="stat-row">
+      <div class="sbox"><div class="sv">98</div><div class="sl">Questions</div></div>
+      <div class="sbox"><div class="sv">134</div><div class="sl">Minutes</div></div>
+      <div class="sbox"><div class="sv">4</div><div class="sl">Modules</div></div>
+      <div class="sbox"><div class="sv">50%</div><div class="sl">Adaptive Cutoff</div></div>
+    </div>
+    <div class="mod-grid">
+      <div class="mcard rw"><div style="font-size:20px">📖</div><div class="mn">Reading &amp; Writing</div><div class="mi">2 modules · 27 questions each · 32 min/module</div></div>
+      <div class="mcard math"><div style="font-size:20px">🧮</div><div class="mn">Math</div><div class="mi">2 modules · 22 questions each · 35 min/module</div></div>
+    </div>
+    <div class="info"><strong>Adaptive routing:</strong> This interactive practice prototype uses a defined routing rule: a score of 50% or higher on Module 1 selects the harder second module; a lower score selects the standard module. The 50% cutoff is illustrative and is not an official College Board routing threshold.</div>
+    <button class="btn-go" onclick="startExam()">Begin Exam →</button>
+  </div>
+</div>
+
+<!-- ══════ MODULE ══════ -->
+<div id="screen-module" class="screen">
+  <div class="ehdr">
+    <div class="sec-lbl" id="hdr-sec">Section</div>
+    <div class="prog-wrap">
+      <div class="prog-bg"><div class="prog-fill" id="prog" style="width:0%"></div></div>
+      <div class="prog-lbl" id="prog-lbl">0 of 0</div>
+    </div>
+    <div class="timer-box"><span>⏱</span><span class="tval" id="timer">32:00</span></div>
+  </div>
+  <div class="ebody">
+    <div class="qpanel">
+      <div class="qnum" id="qnum">Question 1</div>
+      <div id="qdiff"></div>
+      <div id="qpassage"></div>
+      <div class="qtxt" id="qtxt"></div>
+      <div class="opts" id="qopts"></div>
+    </div>
+    <div class="npanel">
+      <div class="ntitle">Navigator</div>
+      <div class="dots" id="dots"></div>
+      <div class="legend">
+        <div class="li"><div class="ld" style="background:var(--gold)"></div>Current</div>
+        <div class="li"><div class="ld" style="background:rgba(212,168,83,.3);border:1px solid var(--gold)"></div>Answered</div>
+        <div class="li"><div class="ld" style="background:var(--surface-2);border:1px solid var(--wrong)"></div>Flagged</div>
+      </div>
+      <div class="nacts">
+        <button class="btn-flag" id="btnflag" onclick="toggleFlag()">🚩 Flag for Review</button>
+        <button class="btn-prev" id="btnprev" onclick="prevQ()">← Previous</button>
+        <button class="btn-next" id="btnnext" onclick="nextQ()">Next →</button>
+        <button class="btn-sub" id="btnsub" onclick="submitModule()">Submit Module ✓</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ BREAK ══════ -->
+<div id="screen-break" class="screen">
+  <div class="bcard">
+    <div class="bicon" id="bicon">☕</div>
+    <h2 class="btitle" id="btitle">Module Complete</h2>
+    <p class="bsub" id="bsub">Take a breath before continuing.</p>
+    <div class="bstats">
+      <div class="bst"><div class="bv" id="bcor">—</div><div class="bl">Correct</div></div>
+      <div class="bst"><div class="bv" id="bpct">—</div><div class="bl">Score %</div></div>
+      <div class="bst"><div class="bv" id="btrk">—</div><div class="bl">Next Track</div></div>
+    </div>
+    <div id="bbadge"></div>
+    <button class="btn-go" id="bbtn" onclick="continueExam()">Continue →</button>
+  </div>
+</div>
+
+<!-- ══════ RESULTS ══════ -->
+<div id="screen-results" class="screen">
+  <div class="rinner">
+    <div class="rhdr">
+      <div class="badge">📊 Exam Complete</div>
+      <h1 class="rtitle">Your Results</h1>
+      <p class="rsub">Full breakdown by section, module, and difficulty</p>
+    </div>
+    <div class="shero">
+      <div class="sbig" id="fscore">0</div>
+      <div class="sden" id="fdenom">out of 98 questions</div>
+      <div class="pbar-bg"><div class="pbar-fill" id="pbar" style="width:0%"></div></div>
+      <div class="plbl" id="plbl">0%</div>
+    </div>
+    <div class="rgrid">
+      <div class="rcard" id="rw-card"></div>
+      <div class="rcard" id="math-card"></div>
+    </div>
+    <div class="revsec">
+      <h2 class="revtitle">Question Review</h2>
+      <div class="filts">
+        <button class="fb on" onclick="setF('all',this)">All</button>
+        <button class="fb" onclick="setF('wrong',this)">Incorrect</button>
+        <button class="fb" onclick="setF('right',this)">Correct</button>
+        <button class="fb" onclick="setF('rw',this)">Reading &amp; Writing</button>
+        <button class="fb" onclick="setF('math',this)">Math</button>
+        <button class="fb" onclick="setF('hard',this)">Hard Questions</button>
+      </div>
+      <div class="revlist" id="revlist"></div>
+    </div>
+    <div class="rfooter"><button class="btn-re" onclick="restart()">↺ Restart Exam</button></div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+//  QUESTION BANK  —  147 questions
+//  rw_easy[25]  rw_medium[30]  rw_hard[26]
+//  math_easy[21]  math_medium[26]  math_hard[19]
+// ══════════════════════════════════════════════════
+const rw_easy=[
+{id:'rwe0',d:'easy',s:'rw',p:'The committee, along with several independent consultants, _____ meeting every Tuesday to review the quarterly data.',q:'Which choice completes the text so it conforms to standard English conventions?',o:['are','is','were','have been'],c:1},
+{id:'rwe1',d:'easy',s:'rw',p:'After the department manager reviewed the proposal with the intern, she decided to present it to the board.',q:'What does the pronoun "she" most likely refer to?',o:['the intern','the board','the manager','the proposal'],c:2},
+{id:'rwe2',d:'easy',s:'rw',p:null,q:'Which choice correctly combines the two sentences?\n"The experiment failed on the first attempt. The team immediately revised their approach."',o:['The experiment failed on the first attempt, the team immediately revised their approach.','The experiment failed on the first attempt; the team immediately revised their approach.','The experiment failed on the first attempt, revising their approach immediately.','The experiment failing on the first attempt, the team revised their approach.'],c:1},
+{id:'rwe3',d:'easy',s:'rw',p:"The architect's design was _____ in its approach, combining materials and techniques from five different centuries into one coherent structure.",q:'Which choice most logically completes the text?',o:['conventional','eclectic','monotonous','austere'],c:1},
+{id:'rwe4',d:'easy',s:'rw',p:'Researchers initially believed the ancient settlement was abandoned due to drought. _____, recent excavations have revealed evidence of a sudden volcanic event.',q:'Which choice most logically completes the text?',o:['Therefore','Similarly','In addition','However'],c:3},
+{id:'rwe5',d:'easy',s:'rw',p:null,q:'Which sentence demonstrates correct parallel structure?',o:['The director wants to hire more staff, expanding the budget, and renovating the office.','The director wants to hire more staff, expand the budget, and renovate the office.','The director wants hiring more staff, to expand the budget, and renovation of the office.','The director wants to hire more staff, expanded the budget, and to renovate the office.'],c:1},
+{id:'rwe6',d:'easy',s:'rw',p:'Neither the chief executive nor the board members _____ been informed of the proposed merger before the announcement.',q:'Which choice completes the text so it conforms to standard English conventions?',o:['has','have','was','were'],c:1},
+{id:'rwe7',d:'easy',s:'rw',p:'By the time the rescue team arrived at the site, the trapped miners _____ underground for more than sixty hours.',q:'Which choice completes the text so it conforms to standard English conventions?',o:['have been','are','had been','were'],c:2},
+{id:'rwe8',d:'easy',s:'rw',p:null,q:'Which choice correctly uses punctuation to separate two independent clauses?',o:['The results were promising, further testing is still required.','The results were promising; further testing is still required.','The results were promising: further testing is still required.','The results were promising although further testing is still required.'],c:1},
+{id:'rwe9',d:'easy',s:'rw',p:"The journalist's account was highly _____, sticking closely to documented facts and avoiding speculation about motive.",q:'Which word most logically completes the text?',o:['biased','factual','speculative','embellished'],c:1},
+{id:'rwe10',d:'easy',s:'rw',p:"The city's recycling program has diverted thousands of tons of waste from landfills. _____, participation rates among residents have increased by forty percent.",q:'Which choice most logically completes the text?',o:['Nevertheless','By contrast','Furthermore','Regardless'],c:2},
+{id:'rwe11',d:'easy',s:'rw',p:null,q:'Which sentence uses apostrophes correctly?',o:["The company changed it's policy after receiving employees' complaints.","The company changed its' policy after receiving employee's complaints.","The company changed its policy after receiving employees' complaints.","The company changed its policy after receiving employees complaints'."],c:2},
+{id:'rwe12',d:'easy',s:'rw',p:'Honeybees communicate the location of food sources through a behavior called the "waggle dance." By moving in a figure-eight pattern and waggling their abdomens, bees convey both the direction and distance of the food relative to the sun.',q:'What is the main idea of the passage?',o:['Honeybees are the most socially complex insects on Earth.','The waggle dance is how honeybees communicate information about food sources.','Honeybees use the sun to navigate when flying long distances.','Scientists have recently decoded the meaning of the waggle dance.'],c:1},
+{id:'rwe13',d:'easy',s:'rw',p:null,q:'Which choice correctly punctuates the following sentence?\n"The lake froze overnight _____ the ice was thick enough to skate on by morning."',o:['overnight, the ice','overnight the ice','overnight; the ice','overnight. The ice'],c:3},
+{id:'rwe14',d:'easy',s:'rw',p:"The board voted to _____ the regulation, removing it from the company's official policy handbook.",q:'Which word most logically completes the text?',o:['implement','enforce','retain','rescind'],c:3},
+{id:'rwe15',d:'easy',s:'rw',p:null,q:'Which sentence places the modifier correctly?',o:['Running down the hall, the trophy fell off the shelf.','The trophy fell off the shelf, running down the hall.','Running down the hall, the student knocked the trophy off the shelf.','The student knocked, running down the hall, the trophy off the shelf.'],c:2},
+{id:'rwe16',d:'easy',s:'rw',p:"A wide variety of plant and animal species _____ found in the wetlands along the river's eastern bank.",q:'Which choice completes the text so it conforms to standard English conventions?',o:['are','is','were','have'],c:0},
+{id:'rwe17',d:'easy',s:'rw',p:'Regular aerobic exercise has been linked to improved cardiovascular health and reduced stress. _____, studies suggest it may also enhance cognitive function and memory.',q:'Which choice most logically completes the text?',o:['However','In contrast','Moreover','Despite this'],c:2},
+{id:'rwe18',d:'easy',s:'rw',p:"The diplomat's remarks were carefully _____, choosing words that acknowledged both sides without openly favoring either.",q:'Which word most logically completes the text?',o:['provocative','measured','reckless','vague'],c:1},
+{id:'rwe19',d:'easy',s:'rw',p:null,q:'Which choice most effectively combines the two sentences?\n"The novel won three international awards. It was translated into twenty languages."',o:['The novel won three international awards, and it was translated into twenty languages.','The novel won three international awards; having been translated into twenty languages.','Translated into twenty languages, three awards were won by the novel.','The novel won three international awards, translating into twenty languages.'],c:0},
+{id:'rwe20',d:'easy',s:'rw',p:null,q:'Which sentence correctly uses commas with a nonrestrictive clause?',o:['The doctor who specializes in cardiology will see you next.','Dr. Patel, who specializes in cardiology, will see you next.','The doctor, who specializes in cardiology will see you next.','Dr. Patel who specializes in cardiology, will see you next.'],c:1},
+{id:'rwe21',d:'easy',s:'rw',p:'Researchers at a coastal university studied the feeding habits of bottlenose dolphins over twelve years. They found that dolphins consistently returned to the same hunting grounds each season, suggesting cultural knowledge passed from older dolphins to younger ones.',q:'Which finding supports the claim about cultural knowledge?',o:['The dolphins were studied for twelve consecutive years.','Researchers worked at a coastal university.','Dolphins consistently returned to the same hunting grounds each season.','Bottlenose dolphins are among the most studied marine mammals.'],c:2},
+{id:'rwe22',d:'easy',s:'rw',p:null,q:'Which version of the sentence is most clear and concise?',o:['The report was written by the intern and submitted by her to the manager.','The intern wrote the report and submitted it to the manager.','The report was written and submitted to the manager by the intern doing so.','Written by the intern, the manager received the submitted report.'],c:1},
+{id:'rwe23',d:'easy',s:'rw',p:'Although the painting had been attributed to a Renaissance master for centuries, a team of art historians recently _____ that attribution, presenting chemical evidence showing the paint was manufactured two hundred years later.',q:'Which word most logically completes the text?',o:['confirmed','celebrated','challenged','preserved'],c:2},
+{id:'rwe24',d:'easy',s:'rw',p:'The first clinical trial of the new drug showed impressive results. _____, the trial involved only fifty participants, raising questions about whether the findings would hold at a larger scale.',q:'Which choice most logically completes the text?',o:['As a result','Furthermore','However','Therefore'],c:2}
+];
+
+const rw_medium=[
+{id:'rwm0',d:'medium',s:'rw',p:'Early in his career, painter Winslow Homer worked as a magazine illustrator, creating detailed images of Civil War scenes. Only after he retreated to the coast of Maine did he develop the bold watercolor technique for which he is celebrated today.',q:'What function does the first sentence serve in relation to the second?',o:['It introduces a misconception that the second sentence corrects.','It provides background context that helps explain the development described in the second sentence.','It presents evidence that directly contradicts the claim in the second sentence.','It summarizes Homer\'s entire artistic career.'],c:1},
+{id:'rwm1',d:'medium',s:'rw',p:"Critics of the city's zoning policy argue that the boundaries between commercial and residential zones were drawn in an arbitrary manner, reflecting the preferences of influential landowners rather than any coherent planning principle.",q:'As used in the passage, "arbitrary" most nearly means:',o:['strict and inflexible','random and without principled basis','outdated and needing revision','widely accepted among planners'],c:1},
+{id:'rwm2',d:'medium',s:'rw',p:'Coral reefs occupy less than one percent of the ocean floor, yet they are home to roughly twenty-five percent of all marine species. Scientists describe them as the "rainforests of the sea." However, rising ocean temperatures have triggered mass bleaching events that threaten these ecosystems.',q:'What is the central idea of the passage?',o:['Coral reefs are the most studied marine ecosystem.','Climate change is the primary cause of reduced ocean biodiversity.','Despite covering a small area, coral reefs support extraordinary biodiversity but face serious climate threats.','Scientists have recently begun comparing marine and terrestrial ecosystems.'],c:2},
+{id:'rwm3',d:'medium',s:'rw',p:'When Louis Daguerre unveiled his photographic invention in 1839, portrait painters across Europe were alarmed. One painter declared the new process a "threat to the very soul of art." Within twenty years, however, many painters came to regard photography as a liberating force that freed them from merely documenting reality.',q:'The passage most strongly implies that before photography, painters:',o:['enjoyed a monopoly on visual storytelling','felt primarily responsible for accurately recording the appearance of their subjects','relied heavily on mechanical aids to achieve realistic representations','had little interest in the philosophical dimensions of their craft'],c:1},
+{id:'rwm4',d:'medium',s:'rw',p:'Researchers studying urban heat islands found that neighborhoods with dense tree canopies are consistently cooler in summer than surrounding areas with little vegetation. One study measured temperature differences of up to 10°F between heavily wooded and sparsely vegetated urban zones.',q:'Which finding most directly supports the claim that trees affect urban temperatures?',o:['Researchers focused their study on neighborhoods with tree canopies.','Urban heat islands have been studied for decades.','Temperature differences of up to 10°F were recorded between wooded and sparsely vegetated areas.','Summer temperatures in cities are generally higher than in rural areas.'],c:2},
+{id:'rwm5',d:'medium',s:'rw',p:"Proponents of a higher minimum wage argue it would reduce income inequality and boost consumer spending. _____, critics contend that businesses facing higher labor costs may reduce staff or raise prices, potentially undermining the very workers the policy aims to help.",q:'Which choice most logically completes the text?',o:['Furthermore','Similarly','As a result','On the other hand'],c:3},
+{id:'rwm6',d:'medium',s:'rw',p:"In 1854, physician John Snow mapped cholera cases in London, plotting each death on a street map and identifying a contaminated water pump as the source. Snow's documentation convinced local authorities to disable the pump, ending the outbreak. His work is now considered a founding moment of modern epidemiology.",q:'What is the primary purpose of the passage?',o:["To argue that modern epidemiology has advanced beyond Snow's methods","To illustrate how careful data collection can lead to public health breakthroughs","To explain the scientific mechanism by which cholera spreads","To compare nineteenth-century and contemporary approaches to disease control"],c:1},
+{id:'rwm7',d:'medium',s:'rw',p:null,q:'Text 1: "Some economists argue that rent control reduces housing affordability in the long run by discouraging new construction and causing landlords to reduce maintenance."\n\nText 2: "A 2019 study of San Francisco found that while rent control reduced displacement for existing tenants, the overall supply of rental housing in controlled areas declined by fifteen percent over the following decade."\n\nHow does Text 2 relate to Text 1?',o:['It directly contradicts Text 1.','It provides empirical evidence partially supporting the concerns in Text 1.','It argues Text 1 overstates the negative effects.','It shifts focus from economics to tenant rights.'],c:1},
+{id:'rwm8',d:'medium',s:'rw',p:'During the Medieval period, European monks were among the few who could read and write, and they spent their lives copying manuscripts by hand. Many monasteries accumulated large libraries that preserved ancient Greek and Roman texts that might otherwise have been lost.',q:'The passage most strongly implies that without monastic copyists, many ancient texts would have:',o:['been preserved by secular scholars','been lost entirely','survived only in fragments','been preserved in Byzantine libraries'],c:1},
+{id:'rwm9',d:'medium',s:'rw',p:'The critic described the performance as "luminous," noting that the lead actor brought an almost otherworldly radiance to a role that lesser performers had found opaque and difficult to convey.',q:'As used in the passage, "luminous" most nearly means:',o:['brilliantly expressive and radiantly vivid','technically precise and disciplined','emotionally subdued yet effective','visually striking in costume and staging'],c:0},
+{id:'rwm10',d:'medium',s:'rw',p:'Languages are not static codes but living systems that evolve continuously in response to social, technological, and cultural pressures. The word "internet" did not exist in any dictionary before 1995, and "selfie" was named word of the year by Oxford Dictionaries in 2013. Linguists now use digital corpora containing billions of words to track how language changes in near-real time.',q:'What is the central idea of the passage?',o:['Oxford Dictionaries tracks language changes more effectively than other institutions.','The internet has been the primary driver of modern language change.','Languages continuously evolve in response to social forces, and technology enables real-time study of this process.','Linguists recently discovered that languages change more rapidly than previously believed.'],c:2},
+{id:'rwm11',d:'medium',s:'rw',p:'Scholars have debated whether the Great Pyramid was built using slave labor. Recent archaeological evidence points to a workforce of paid craftsmen. Records discovered at the site indicate that workers received rations of bread, beer, and cattle, suggesting they were compensated for their labor.',q:'Which detail provides the strongest support for the claim that pyramid workers may not have been enslaved?',o:['Scholars have long debated the conditions of pyramid construction.','Recent discoveries have reopened the question.','Workers received rations of bread, beer, and cattle, suggesting compensation.','Records documenting the workforce were discovered at the site.'],c:2},
+{id:'rwm12',d:'medium',s:'rw',p:'After World War II, many economists predicted the United States would fall back into recession. Instead, the economy expanded dramatically as returning soldiers entered the workforce, pent-up consumer demand was released, and the GI Bill made homeownership and college accessible to millions.',q:"The passage most strongly implies that economists' postwar predictions were:",o:['accurate but based on an incomplete understanding of government spending','incorrect because they failed to anticipate the effects of postwar social policies','deliberately pessimistic to justify stimulus programs','shared by the general public who feared a return to Depression conditions'],c:1},
+{id:'rwm13',d:'medium',s:'rw',p:"A student wants to write a report on plastic pollution. The student has already written: \"Plastic packaging has become a ubiquitous feature of modern consumer culture.\"\n\nWhich sentence most logically follows?",q:'Which choice most effectively continues the introduction?',o:['There are many different types of plastic, each with distinct properties.','Each year, approximately 300 million tons of plastic are produced globally, and nearly half ends up in landfills or oceans.','The first synthetic plastic, Bakelite, was invented in 1907.','Some municipalities have begun banning single-use plastic bags.'],c:1},
+{id:'rwm14',d:'medium',s:'rw',p:"The researchers began by challenging a long-standing assumption: that birds navigate primarily using the stars. They presented evidence that several species detect Earth's magnetic field through iron-rich cells in their beaks. Finally, they proposed a model in which magnetic sensing serves as a primary navigational tool.",q:'Which best describes the overall structure of the passage?',o:['A problem is presented, a cause identified, and a solution proposed.','An assumption is questioned, evidence is presented, and a new model is proposed.','A discovery is announced, its history traced, and implications debated.','A claim is made, disputed, and a compromise reached.'],c:1},
+{id:'rwm15',d:'medium',s:'rw',p:'For centuries, historians characterized the Middle Ages as a period of intellectual stagnation between the brilliance of classical antiquity and the Renaissance. _____, more recent scholarship has revealed a period of remarkable innovation in agriculture, architecture, and legal theory.',q:'Which choice most logically completes the text?',o:['Similarly','As a result','In contrast','Moreover'],c:2},
+{id:'rwm16',d:'medium',s:'rw',p:'In her memoirs, the novelist describes her early years as "fallow," a period during which she produced almost nothing but absorbed vast quantities of reading that would later nourish her fiction.',q:'As used in the passage, "fallow" most nearly means:',o:['difficult and marked by personal hardship','unproductive in output but potentially fertile for future work','creatively fulfilling despite low public visibility','deliberately chosen as a period of artistic rest'],c:1},
+{id:'rwm17',d:'medium',s:'rw',p:'Art historians have argued that Impressionism represented a radical break with academic painting. Claude Monet painted outdoors in natural light, capturing fleeting atmospheric effects. Pierre-Auguste Renoir similarly prioritized everyday social life over the mythological subjects favored by the Academy.',q:'The examples of Monet and Renoir are used to:',o:['compare the individual styles of two prominent Impressionists','demonstrate how specific Impressionist practices departed from academic conventions','argue that outdoor painting was the defining feature of Impressionism','show that Impressionism was primarily a response to Renoir\'s earlier academic work'],c:1},
+{id:'rwm18',d:'medium',s:'rw',p:'In the nineteenth century, medical wisdom held that illness was caused by "miasmas," or foul-smelling air from rotting matter. Hospitals built on this theory were placed to minimize bad smells, but proximity to actual sources of infection — such as open sewage — was not considered a concern.',q:'Which inference is most strongly supported by the passage?',o:['Miasma theory accurately identified the relationship between sanitation and disease.','Nineteenth-century hospital placement decisions may have inadvertently increased exposure to infection.','Physicians in the nineteenth century were uninterested in the causes of infectious disease.','The miasma theory was developed in response to industrial-city sanitary conditions.'],c:1},
+{id:'rwm19',d:'medium',s:'rw',p:'The Silk Road was not a single road but an interconnected network of overland and maritime trade routes stretching from China to the Mediterranean. Beyond transporting goods like silk, spices, and glassware, it served as a conduit for the spread of religions, diseases, technologies, and ideas across Eurasia for more than a millennium.',q:'What is the central idea of the passage?',o:['The Silk Road was responsible for the spread of major world religions.','The Silk Road consisted of a more complex network than its name suggests.','The Silk Road functioned not only as a trade network but also as a channel for broad cultural exchange.','China\'s position at the eastern end of the Silk Road made it the center of global commerce.'],c:2},
+{id:'rwm20',d:'medium',s:'rw',p:'In 1944, delegates from forty-four nations gathered at Bretton Woods, New Hampshire, to design a new international monetary system. Their goal was to prevent the competitive currency devaluations that had deepened the Great Depression. The agreement established the U.S. dollar as the primary reserve currency and created the IMF and the World Bank.',q:'The primary purpose of the passage is to:',o:['argue that the Bretton Woods agreement ultimately failed','describe the origins and outcomes of a landmark international economic summit','compare economic philosophy of the 1930s with the postwar era','explain the technical role of the U.S. dollar in currency markets'],c:1},
+{id:'rwm21',d:'medium',s:'rw',p:"The study's authors noted that the positive correlation between screen time and attention difficulties was robust across all demographic subgroups, making it difficult to attribute the finding to any single confounding variable.",q:'As used in the passage, "robust" most nearly means:',o:['statistically complex and requiring advanced analysis','consistent and resistant to alternative explanations','surprising given the diversity of the sample','limited in scope to one particular age group'],c:1},
+{id:'rwm22',d:'medium',s:'rw',p:'Anthropologists studying gift economies — societies organized around gift exchange rather than market transactions — have found that such systems create dense webs of social obligation. Receiving a gift typically requires giving one in return, often of comparable or greater value, reinforcing bonds between community members.',q:'Based on the passage, which conclusion about gift economies is most strongly supported?',o:['Gift economies are more economically efficient than market-based economies.','Gift exchange in such societies serves primarily a social rather than a purely economic function.','Anthropologists have concluded that gift economies are unsustainable long-term.','Gifts must always be of greater value than those originally received.'],c:1},
+{id:'rwm23',d:'medium',s:'rw',p:"A student is writing a paper arguing that public investment in the arts contributes to urban economic growth.\n\nWhich of the following would most strengthen this argument?",q:'Which choice best supports the argument?',o:['A survey showing that most residents believe the arts are an important part of cultural identity.','A case study documenting how a new performing arts center attracted restaurants, hotels, and retail development to the surrounding neighborhood.','A history of public arts funding in the United States from the New Deal to the present.','A quotation from a novelist praising the importance of arts education in schools.'],c:1},
+{id:'rwm24',d:'medium',s:'rw',p:"The historian argues that the success of the American Revolution was by no means inevitable. Colonial forces were consistently outnumbered and outgunned. The Continental Army suffered chronic shortages of food, ammunition, and clothing. Washington reportedly wrote that the army was 'constantly on the verge of dissolution' at Valley Forge.",q:"Which detail most directly supports the claim that the Revolution's success was uncertain?",o:['The historian questions a widely held assumption about the Revolution.','Washington wrote personally about the army\'s struggles during the war.','The Continental Army endured persistent shortages of essential supplies.','British forces were professionally trained regular soldiers.'],c:2},
+{id:'rwm25',d:'medium',s:'rw',p:'Scientists have long believed the deep ocean floor is largely barren due to the absence of sunlight and extreme cold. _____, the discovery of hydrothermal vents in 1977 revealed thriving ecosystems sustained entirely by chemosynthesis rather than photosynthesis.',q:'Which choice most logically completes the text?',o:['Consequently','In addition','Similarly','However'],c:3},
+{id:'rwm26',d:'medium',s:'rw',p:'The article opens with statistics documenting rapid insect population decline over three decades. It then presents testimony from agricultural scientists warning of cascading effects on food systems. The piece concludes by examining proposed policy interventions and assessing evidence for their effectiveness.',q:'The structure of the article moves from:',o:['a hypothesis to experimental results to revised theory','evidence of a problem to expert warnings to potential solutions','historical background to present conditions to future predictions','individual anecdotes to broader patterns to systemic analysis'],c:1},
+{id:'rwm27',d:'medium',s:'rw',p:'Unlike conventional drug development, which targets specific molecular mechanisms and often produces side effects, personalized medicine aims to tailor treatments to an individual patient\'s genetic profile. By analyzing a patient\'s genome, clinicians may eventually predict which drugs will be most effective and which are likely to cause adverse reactions.',q:'What is the central idea of the passage?',o:['Conventional medicine has largely failed to address the problem of drug side effects.','Personalized medicine uses genetic information to develop treatments optimized for individual patients.','The human genome contains the key to eliminating all adverse drug reactions.','Genetic analysis has already replaced conventional drug development.'],c:1},
+{id:'rwm28',d:'medium',s:'rw',p:'The printing press, introduced to Europe around 1440, dramatically reduced the cost of producing books. Within fifty years of Gutenberg\'s invention, more books had been printed in Europe than in the entire preceding millennium of hand-copied manuscript production.',q:'The passage most strongly implies that before the printing press:',o:['few Europeans had any interest in owning books','book production was slow and expensive, limiting the availability of written material','religious authorities controlled all written knowledge','there was little demand for original literary or philosophical works'],c:1},
+{id:'rwm29',d:'medium',s:'rw',p:'The sociologist argued that social media platforms have an incentive to cultivate outrage, since emotionally charged content generates more engagement than neutral posts. This creates a perverse dynamic in which platforms financially benefit from the polarization they ostensibly seek to curb.',q:'As used in the passage, "perverse" most nearly means:',o:['morally corrupt and intentionally harmful','contrary to what is right or expected, given the stated goal','unusual and difficult to understand without context','increasingly common in the digital economy'],c:1}
+];
+
+const rw_hard=[
+{id:'rwh0',d:'hard',s:'rw',p:'A 2022 study compared cognitive test scores among elderly adults who consumed omega-3-rich diets with those who did not. The omega-3 group scored fifteen percent higher on memory assessments. The researchers controlled for exercise habits, education level, and cardiovascular health.',q:"A critic argues results may be explained by socioeconomic factors — wealthier individuals both afford omega-3 foods and have greater access to cognitive stimulation. Which would most weaken this critique?",o:['The omega-3 foods in the study were priced similarly to foods in the control group.','The study\'s sample was drawn from a population with a narrow, consistent income range.','Other studies have also found correlations between omega-3 consumption and cognition.','Cognitive stimulation is known to improve memory test scores independently of diet.'],c:1},
+{id:'rwh1',d:'hard',s:'rw',p:"The historian contends that the printing press was the primary driver of the Protestant Reformation, arguing that without widespread distribution of Luther's writings, his ideas would never have gained the following that challenged the Catholic Church.",q:"Which of the following, if true, would most directly undermine the historian's argument?",o:["Luther's writings were among the earliest texts printed on Gutenberg's press.","Significant religious reform movements in Europe predated the printing press by over a century.","The Catholic Church eventually embraced print technology to distribute its own doctrinal texts.","Luther himself expressed admiration for the printing press as a tool of religious change."],c:1},
+{id:'rwh2',d:'hard',s:'rw',p:'A nutrition researcher found that among participants consuming five or more vegetable servings per day, 12% were diagnosed with hypertension by age 60. Among those consuming two to four servings, the rate was 24%. Among those consuming fewer than two servings, the rate was 39%.',q:'Which conclusion is most directly supported by the data?',o:['Vegetable consumption is the single most important factor in preventing hypertension.','Reducing vegetable consumption from five or more to two to four servings roughly doubles the hypertension rate.','Participants consuming no vegetables had a rate exactly three times higher than those consuming five or more servings.','The researcher concluded that five servings per day eliminates hypertension risk entirely.'],c:1},
+{id:'rwh3',d:'hard',s:'rw',p:'The urban planner writes: "We have inherited cities designed for cars, not for the humans who inhabit them. Streets that could be parks are instead ribbons of asphalt. Buildings that could face one another in community face nothing but traffic. To reclaim our cities is not merely an aesthetic project — it is a civilizational one."',q:'The planner\'s use of "civilizational" in the final sentence primarily serves to:',o:['introduce a statistical argument about economic costs of car-dependent infrastructure','elevate the stakes of urban redesign beyond aesthetics to questions of fundamental human well-being','compare contemporary cities unfavorably with ancient civilizations','suggest car-dependent design has caused measurable decline in civic participation'],c:1},
+{id:'rwh4',d:'hard',s:'rw',p:null,q:'Text 1: "The philosopher argues that free will is an illusion: every decision is the inevitable product of prior causes — genetics, environment, brain chemistry — making moral responsibility conceptually incoherent."\n\nText 2: "Neuroscientist Patricia Churchland challenges hard determinists, proposing that even if all behavior is causally determined, societies can coherently hold individuals responsible because doing so reduces harmful behavior and encourages prosocial norms."\n\nHow does Text 2 engage with Text 1?',o:['It accepts the premise that free will is an illusion but argues moral responsibility remains coherent on consequentialist grounds.','It disputes the claim that human decisions are causally determined.','It argues neuroscience has settled the debate in favor of determinism.','It agrees with Text 1 that moral responsibility is incoherent but proposes a different framework.'],c:0},
+{id:'rwh5',d:'hard',s:'rw',p:'An economist argues the decline of U.S. manufacturing employment over four decades is primarily attributable to trade competition from lower-wage countries. To support this, the economist notes the correlation between expansion of U.S.-China trade after 2001 and the acceleration of factory job losses.',q:"Which would most seriously weaken the economist's argument?",o:['Manufacturing output in the United States actually increased during the same period employment declined.','Some U.S. firms moved production to China seeking lower labor costs.','Several other countries that trade heavily with China also saw manufacturing job losses.','U.S.-China trade continued expanding even after manufacturing employment stabilized.'],c:0},
+{id:'rwh6',d:'hard',s:'rw',p:'"Broken windows" policing argues that aggressively addressing minor visible disorder — graffiti, broken windows, public intoxication — deters serious crime by signaling a community maintains high social standards.',q:'A researcher claims crime fell in cities that adopted broken windows policies. A critic argues this evidence does not validate the policy. Which reasoning best supports the critic?',o:['Crime fell in many cities that did NOT adopt broken windows policing during the same period.','Graffiti and broken windows are not reliable indicators of a community\'s social norms.','The policy was applied inconsistently across different neighborhoods.','Critics of broken windows policing have not proposed an equally comprehensive alternative.'],c:0},
+{id:'rwh7',d:'hard',s:'rw',p:'A technology company argues its recommendation algorithm is neutral because it applies the same ranking criteria equally to all content creators regardless of political affiliation.',q:"A media critic argues the company's claim is flawed. Which reasoning most directly supports the critic?",o:['The ranking criteria themselves may favor content — such as emotionally provocative material — that correlates with particular political viewpoints.','The company has a financial interest in engagement and therefore cannot be objective.','The algorithm was designed by engineers who may hold personal political biases.','Some content creators have publicly accused the company of unfair treatment.'],c:0},
+{id:'rwh8',d:'hard',s:'rw',p:'A study found that workers commuting more than 60 minutes each way reported life satisfaction scores averaging 6.1 out of 10, compared to 7.4 for those commuting 30 minutes or less. Every additional 10 minutes of commute was associated with a 0.2-point decline in life satisfaction.',q:'Based on the data, what is the predicted life satisfaction score for a worker with a 50-minute commute?',o:['6.5','6.7','7.0','7.2'],c:2},
+{id:'rwh9',d:'hard',s:'rw',p:'In her opening brief, the attorney writes: "The contract\'s silence on this matter is not ambiguity — it is a deliberate void, an invitation for the court to recognize what both parties understood but neither felt the need to state: that good faith is presumed in every commercial relationship."',q:'The attorney\'s use of "deliberate void" primarily serves to:',o:['acknowledge that the contract contains a critical drafting error','reframe the contract\'s silence as evidence of shared understanding rather than an oversight','argue that silence in a legal document should always favor the defendant','establish that both parties intentionally excluded good-faith provisions'],c:1},
+{id:'rwh10',d:'hard',s:'rw',p:'A hospital tracked readmission rates before and after implementing a follow-up call program. Before: 22% of patients readmitted within 30 days. After: 15%. The program cost $200,000 to operate, and each avoided readmission saved the hospital approximately $8,000.',q:'If the hospital discharged 1,000 patients each year, approximately how much did it save on avoided readmissions, and did savings exceed the program cost?',o:['The hospital saved approximately $56,000, less than the program cost.','The hospital saved approximately $560,000, exceeding the program cost.','The hospital saved approximately $150,000, less than the program cost.','The hospital saved approximately $220,000, exceeding the program cost.'],c:1},
+{id:'rwh11',d:'hard',s:'rw',p:"The memo begins: 'While we recognize the board's concerns about quarterly performance, we would respectfully suggest that the metrics used to evaluate the division may not fully capture the strategic value being created.' Three pages of supporting data follow.",q:'The phrase "respectfully suggest" primarily functions to:',o:["Concede that the board's metrics are correct and should be retained","Introduce a direct challenge to the board's position while maintaining a diplomatic tone","Indicate that the memo's authors lack confidence in their data","Signal full agreement with the board's assessment of the division"],c:1},
+{id:'rwh12',d:'hard',s:'rw',p:"Throughout the 1920s, jazz clubs in Chicago and New York drew racially mixed audiences in defiance of prevailing segregationist norms. Club owners reportedly discouraged racial mixing in seating while simultaneously marketing the integrated nature of their performances as a sign of cultural sophistication.",q:"The passage most strongly implies that club owners' attitude toward racial integration was:",o:['genuinely committed to racial equality as both a business strategy and moral principle','self-contradictory: they limited social integration while exploiting its cultural cachet for profit','primarily driven by fear of legal consequences for violating segregation laws','consistent with the broader progressive social attitudes of the 1920s'],c:1},
+{id:'rwh13',d:'hard',s:'rw',p:null,q:'Text 1: "Evolutionary biologists argue that altruistic behavior cannot be explained by natural selection acting on individuals, since altruistic individuals sacrifice reproductive fitness. The phenomenon requires \'group selection\': groups with altruistic individuals outcompete purely selfish groups."\n\nText 2: "Richard Dawkins challenged group selection, arguing that genes are the true units of natural selection. Behaviors appearing altruistic at the individual level — such as a worker bee defending the hive — can be explained as genes promoting copies of themselves in related individuals, which Dawkins called \'inclusive fitness.\'"\n\nHow does Text 2 differ from Text 1?',o:['Text 2 argues altruistic behavior does not actually exist.','Text 2 shifts the level of analysis from the group to the gene, proposing altruism evolves without requiring group selection.','Text 2 agrees with Text 1 that individual selection cannot explain altruism but proposes different types of groups.','Text 2 argues only social insects exhibit genuine altruism.'],c:1},
+{id:'rwh14',d:'hard',s:'rw',p:'The paper begins by acknowledging a long-standing cosmological puzzle: the universe\'s expansion appears to be accelerating, yet known matter and energy are insufficient to explain this. The paper then introduces "dark energy," an undetected form of energy permeating all of space. The remainder explores three competing dark energy models and evaluates observational evidence for each.',q:'The structure of the paper can best be described as:',o:['advancing from theoretical claim to experimental confirmation to revised predictions','presenting a scientific anomaly, proposing a hypothetical solution, and analyzing competing versions of that solution','reviewing the history of cosmological models and identifying the most recently accepted one','challenging an established theory, proposing a replacement, and defending it against criticism'],c:1},
+{id:'rwh15',d:'hard',s:'rw',p:null,q:'Text 1: "Some urban planners argue that raising parking minimum requirements is essential to prevent traffic congestion as cities grow."\n\nText 2: "A study of 50 U.S. cities found that cities with higher parking minimums had, counterintuitively, higher rates of traffic congestion, likely because cheap abundant parking encouraged more residents to drive rather than use public transit."\n\nHow does Text 2 relate to Text 1?',o:['It supports Text 1 by showing parking minimums reduce congestion.','It contradicts Text 1 by suggesting higher parking minimums may actually increase congestion.','It modifies Text 1 by proposing parking minimums should be set at intermediate levels.','It challenges Text 1\'s assumption that planners have the authority to set parking requirements.'],c:1},
+{id:'rwh16',d:'hard',s:'rw',p:"The senator's speech acknowledges environmental concerns: \"No one who has seen the satellite photographs of the watershed understands this less than I do.\" She then pivots: \"But to ask rural communities to bear alone the economic costs of a federal conservation policy that benefits the entire nation is not stewardship — it is sacrifice.\"",q:"The senator's rhetorical strategy primarily involves:",o:['Conceding environmental urgency in order to argue for shared national responsibility in conservation costs','Denying that the conservation policy would have any meaningful environmental effect','Arguing that rural communities are better positioned than federal agencies to manage local conservation','Suggesting satellite photographs are an inadequate basis for environmental policy'],c:0},
+{id:'rwh17',d:'hard',s:'rw',p:"After the Civil War, many Southern states passed vagrancy laws that criminalized unemployment, allowing local authorities to arrest and lease formerly enslaved individuals to private landowners, mines, and railroad companies as convict laborers. Historians have documented cases in which African American men arrested for minor infractions remained in this system for years.",q:'Based on the passage, the vagrancy laws most strongly appear to have served the function of:',o:['deterring criminal activity in postwar communities','recreating conditions of unfree labor for African Americans following the formal abolition of slavery','providing state governments with revenue to fund Reconstruction','regulating labor movement in response to widespread unemployment among all racial groups'],c:1},
+{id:'rwh18',d:'hard',s:'rw',p:null,q:'Text 1: "Writing in 1976, the sociologist argues that nuclear families represent the optimal social unit for economic stability and child socialization in industrial societies."\n\nText 2: "A longitudinal study published in 2018 found no statistically significant difference in academic achievement, emotional well-being, or economic outcomes among adults raised in nuclear families versus those raised by single parents, same-sex parents, or extended family networks — when socioeconomic factors were controlled for."\n\nHow does Text 2 engage with Text 1?',o:["It supports the sociologist's claim by documenting stable nuclear family outcomes.","It challenges the sociologist's claim by showing family structure is less predictive of outcomes than socioeconomic factors.","It extends the sociologist's framework by identifying new family structures that also produce optimal outcomes.","It argues the sociologist's 1976 analysis was valid at the time but is no longer applicable."],c:1},
+{id:'rwh19',d:'hard',s:'rw',p:"The essay opens with a hypothetical scenario: a society in which every citizen's brain is connected to a network that distributes pleasure equally. The author uses this to probe a central question: if maximum collective happiness is achievable, does any other moral consideration matter? The final sections dismantle five possible objections to sacrificing individual autonomy for collective pleasure.",q:'The hypothetical scenario primarily functions to:',o:['provide a realistic prediction of what a technologically advanced society might look like','create a memorable illustration of an abstract philosophical position that the essay then scrutinizes','serve as a cautionary tale warning readers about centralized government','establish the author\'s credentials as a thinker willing to consider unconventional proposals'],c:1},
+{id:'rwh20',d:'hard',s:'rw',p:'A climate team analyzed data from 1,200 weather stations globally. Between 1970 and 2020, Arctic stations recorded an average temperature increase of 3.2°C, while tropical stations recorded an average increase of 0.8°C. The global average increase was 1.1°C.',q:'Which claim is best supported by the data?',o:['Climate change has had no measurable effect on tropical regions.','The global average temperature increase understates the magnitude of Arctic warming.','Tropical temperature increases will eventually equal Arctic increases.','The 1,200 stations provide an accurate representation of all global regions equally.'],c:1},
+{id:'rwh21',d:'hard',s:'rw',p:'The architects of the U.S. Constitution were deeply skeptical of direct democracy. They created a republic with layered institutions — the Senate, the Electoral College, and an appointed judiciary — that would slow deliberation and filter popular opinion through representative intermediaries. James Madison wrote in Federalist No. 10 that direct democracy was prone to the "mischiefs of faction."',q:'Based on the passage, Madison and the founders most likely designed the republic\'s institutions to:',o:['ensure only educated and propertied citizens could influence governance','give each branch equal power over federal legislation','prevent temporary or impassioned majorities from immediately translating their preferences into law','eliminate the possibility of organized political parties forming'],c:2},
+{id:'rwh22',d:'hard',s:'rw',p:'The economist opens with a striking concession: "The critics of globalization are not wrong." She continues: "They are simply incomplete. The dislocations they document are real. But the counterfactual — a world of closed economies — would have produced its own dislocations, on a larger scale and with less capacity for remedy."',q:'The phrase "the counterfactual" primarily serves to:',o:['introduce historical evidence that closed economies have consistently performed worse','redirect attention from the documented costs of globalization to the hypothetical costs of its alternative','concede that critics of globalization have accurately described its full effects','define a technical economic term that the rest of the passage will use as a framework'],c:1},
+{id:'rwh23',d:'hard',s:'rw',p:'When archaeologists excavated an ancient Mesopotamian city, storage facilities for grain were among the largest and most carefully constructed buildings, often exceeding residential structures. Elaborate record-keeping systems, including clay tablets tracking the receipt and distribution of grain, were found in large quantities.',q:'The details about storage facilities and record-keeping most strongly suggest that this city:',o:['was primarily a trading center specializing in agricultural exports','had developed a centralized administrative system capable of managing and redistributing food resources','experienced frequent food shortages that required careful storage and detailed distribution records','was governed by a religious institution that controlled access to grain as political authority'],c:1},
+{id:'rwh24',d:'hard',s:'rw',p:'A pharmaceutical company argues that its new drug, which reduced systolic blood pressure by an average of 12 mmHg in a six-week trial, is ready for broad clinical approval. The company notes that no serious adverse events were reported.',q:"Which finding would most undermine the company's readiness argument?",o:['A competing drug reduces systolic blood pressure by only 8 mmHg on average.','Most hypertension-related cardiovascular events occur over years or decades, making six weeks insufficient to assess long-term safety.','Some participants in the trial were also taking other antihypertensive medications.','The trial was conducted at a single medical center rather than multiple sites.'],c:1},
+{id:'rwh25',d:'hard',s:'rw',p:"In the memoir's first section, the author describes her childhood village in rural Nigeria in lush, celebratory prose, cataloging the sounds, smells, and textures of daily life with evident love. In the second section, set during civil conflict, the same landscape is rendered in terse, fragmented sentences. Critics noted that the shift in style mirrors the narrator's psychological state — from wholeness to fracture.",q:"Critics' observation about the memoir's style primarily highlights how the author uses:",o:['unreliable narration to call into question the accuracy of childhood memories','structural and linguistic contrast to embody the narrator\'s psychological transformation','a shift from descriptive to argumentative prose to convey the political dimensions of conflict','multiple narrative voices to reflect diverse experiences of the conflict'],c:1}
+];
+
+const math_easy=[
+{id:'me0',d:'easy',s:'math',p:null,q:'If 3x + 7 = 22, what is the value of x?',o:['3','5','7','9'],c:1},
+{id:'me1',d:'easy',s:'math',p:null,q:'A jacket costs $80 and is on sale for 25% off. What is the sale price?',o:['$20','$55','$60','$65'],c:2},
+{id:'me2',d:'easy',s:'math',p:null,q:'A rectangle has a length of 12 cm and a width of 5 cm. What is its area?',o:['34 cm²','60 cm²','70 cm²','17 cm²'],c:1},
+{id:'me3',d:'easy',s:'math',p:null,q:'What is the slope of the line passing through (2, 3) and (6, 11)?',o:['1','2','3','4'],c:1},
+{id:'me4',d:'easy',s:'math',p:null,q:'What is the value of 3 + 4 × 2 − 1?',o:['13','10','12','6'],c:1},
+{id:'me5',d:'easy',s:'math',p:null,q:'In a class of 30 students, 18 are girls. What is the ratio of boys to girls?',o:['2 : 3','3 : 2','3 : 5','5 : 3'],c:0},
+{id:'me6',d:'easy',s:'math',p:null,q:'If 5x − 3 = 2x + 9, what is the value of x?',o:['2','3','4','6'],c:2},
+{id:'me7',d:'easy',s:'math',p:null,q:'A store raises a shirt price from $40 to $50. By what percentage did the price increase?',o:['10%','20%','25%','40%'],c:2},
+{id:'me8',d:'easy',s:'math',p:null,q:'A rectangle has length 9 m and width 4 m. What is its perimeter?',o:['13 m','26 m','36 m','52 m'],c:1},
+{id:'me9',d:'easy',s:'math',p:null,q:'Maria buys 3 notebooks at $2.50 each and 2 pens at $1.25 each. How much does she spend in total?',o:['$8.75','$9.50','$10.00','$11.25'],c:2},
+{id:'me10',d:'easy',s:'math',p:null,q:'If x = 3, what is the value of 4x² − 2x + 1?',o:['19','25','31','37'],c:2},
+{id:'me11',d:'easy',s:'math',p:null,q:'How many inches are in 4.5 feet? (1 foot = 12 inches)',o:['48','50','54','60'],c:2},
+{id:'me12',d:'easy',s:'math',p:null,q:'A sequence adds 5 to each term. If the first term is 3, what is the fifth term?',o:['18','20','23','28'],c:2},
+{id:'me13',d:'easy',s:'math',p:null,q:'Which of the following is NOT a factor of 36?',o:['4','6','8','9'],c:2},
+{id:'me14',d:'easy',s:'math',p:null,q:'A point is at (−3, 4). In which quadrant is it located?',o:['Quadrant I','Quadrant II','Quadrant III','Quadrant IV'],c:1},
+{id:'me15',d:'easy',s:'math',p:null,q:'What is the value of x in the equation x/4 + 3 = 8?',o:['8','12','20','28'],c:2},
+{id:'me16',d:'easy',s:'math',p:null,q:'What is 3/4 + 5/8?',o:['8/12','1','11/8','15/8'],c:2},
+{id:'me17',d:'easy',s:'math',p:null,q:'Five students scored 72, 85, 91, 68, and 94. What is the range?',o:['19','22','26','31'],c:2},
+{id:'me18',d:'easy',s:'math',p:null,q:'If f(x) = 3x − 5, what is f(4)?',o:['5','7','9','12'],c:1},
+{id:'me19',d:'easy',s:'math',p:null,q:'Two angles are supplementary. One measures 65°. What does the other measure?',o:['25°','90°','115°','295°'],c:2},
+{id:'me20',d:'easy',s:'math',p:null,q:'Which value of x satisfies 2x − 3 > 7?',o:['x = 3','x = 5','x = 6','x = 4'],c:2}
+];
+
+const math_medium=[
+{id:'mm0',d:'medium',s:'math',p:null,q:'If x + y = 10 and x − y = 4, what is x?',o:['3','5','7','8'],c:2},
+{id:'mm1',d:'medium',s:'math',p:null,q:'Which values of x satisfy x² − 5x + 6 = 0?',o:['x = 1 and x = 6','x = 2 and x = 3','x = −2 and x = −3','x = 3 and x = 6'],c:1},
+{id:'mm2',d:'medium',s:'math',p:null,q:'A right triangle has legs of 5 and 12. What is the hypotenuse?',o:['10','13','15','17'],c:1},
+{id:'mm3',d:'medium',s:'math',p:null,q:'Faucet A fills a tank in 3 hours. Faucet B fills it in 6 hours. How long together?',o:['1.5 hours','2 hours','4 hours','4.5 hours'],c:1},
+{id:'mm4',d:'medium',s:'math',p:null,q:'Simplify: (2³)² × 2',o:['64','96','128','256'],c:2},
+{id:'mm5',d:'medium',s:'math',p:null,q:'A bag has 4 red, 3 blue, 5 green marbles. What is the probability a random draw is NOT red?',o:['1/3','1/2','2/3','3/4'],c:2},
+{id:'mm6',d:'medium',s:'math',p:null,q:'The mean of five numbers is 14. Four of them are 10, 12, 16, 18. What is the fifth?',o:['12','14','16','18'],c:1},
+{id:'mm7',d:'medium',s:'math',p:null,q:'A gym charges a $25 fee plus $10 per class. A member pays $95 total. How many classes?',o:['5','6','7','8'],c:2},
+{id:'mm8',d:'medium',s:'math',p:null,q:"A car's value dropped from $18,000 to $13,500. What is the percent decrease?",o:['20%','25%','30%','33%'],c:1},
+{id:'mm9',d:'medium',s:'math',p:null,q:'What is the area of a circle with radius 6? (π ≈ 3.14)',o:['37.68','75.36','113.04','150.72'],c:2},
+{id:'mm10',d:'medium',s:'math',p:null,q:'Which expression is equivalent to x² − 9?',o:['(x − 3)²','(x + 3)(x − 3)','(x − 9)(x + 1)','(x + 9)(x − 1)'],c:1},
+{id:'mm11',d:'medium',s:'math',p:null,q:'A blend uses Type A beans at $8/lb and Type B at $12/lb. A 10-lb blend averages $9.60/lb. How many pounds of Type A?',o:['4 lbs','6 lbs','7 lbs','8 lbs'],c:1},
+{id:'mm12',d:'medium',s:'math',p:null,q:'The data set {5, 7, 7, 9, 11, 13, 13, 13, 15} — what are the mode and median?',o:['Mode = 7, Median = 11','Mode = 13, Median = 11','Mode = 13, Median = 12','Mode = 7, Median = 12'],c:1},
+{id:'mm13',d:'medium',s:'math',p:null,q:'A school sells student tickets for $3 and adult tickets for $5. 200 tickets sold totaling $780. How many adult tickets?',o:['60','90','110','140'],c:1},
+{id:'mm14',d:'medium',s:'math',p:null,q:'What is the vertex of the parabola y = x² − 6x + 11?',o:['(3, 2)','(−3, 2)','(3, −2)','(6, 11)'],c:0},
+{id:'mm15',d:'medium',s:'math',p:null,q:'What is the solution set of 3x − 4 ≤ 2x + 1?',o:['x ≤ −5','x ≥ 5','x ≤ 5','x ≥ −5'],c:2},
+{id:'mm16',d:'medium',s:'math',p:null,q:'What is the midpoint of the segment connecting (−2, 4) and (6, −8)?',o:['(2, −4)','(2, −2)','(4, −2)','(−2, 2)'],c:1},
+{id:'mm17',d:'medium',s:'math',p:null,q:'Two similar triangles: smaller has sides 3, 4, 5. The longest side of the larger is 20. What is the larger triangle\'s perimeter?',o:['36','40','48','60'],c:2},
+{id:'mm18',d:'medium',s:'math',p:null,q:'A car travels 240 miles in 4 hours. At the same speed, how long to travel 360 miles?',o:['5 hours','5.5 hours','6 hours','7 hours'],c:2},
+{id:'mm19',d:'medium',s:'math',p:null,q:'A scatter plot shows a strong positive correlation. Which statement best describes the relationship?',o:['As x increases, y tends to decrease.','As x increases, y tends to increase.','There is no predictable relationship between x and y.','Changes in x have no effect on y.'],c:1},
+{id:'mm20',d:'medium',s:'math',p:null,q:'A bacteria population doubles every 3 hours. Starting at 500, how many after 9 hours?',o:['1,500','2,000','4,000','8,000'],c:2},
+{id:'mm21',d:'medium',s:'math',p:null,q:'What is the solution of |2x − 3| = 7?',o:['x = 5 only','x = −2 only','x = 5 or x = −2','x = 2 or x = −5'],c:2},
+{id:'mm22',d:'medium',s:'math',p:null,q:'If f(x) = 2x + 1 and g(x) = x², what is f(g(3))?',o:['13','17','19','25'],c:2},
+{id:'mm23',d:'medium',s:'math',p:null,q:'A rectangular box has length 6, width 4, height 3. What is its volume?',o:['48','60','72','96'],c:2},
+{id:'mm24',d:'medium',s:'math',p:null,q:'Which expression is equivalent to (x² − x − 6) / (x − 3)?',o:['x − 3','x + 2','x − 2','x + 3'],c:1},
+{id:'mm25',d:'medium',s:'math',p:null,q:'Line m passes through (0, 3) and (4, 11). Which equation represents this line?',o:['y = 3x + 2','y = 2x + 3','y = 2x − 3','y = 4x + 3'],c:1}
+];
+
+const math_hard=[
+{id:'mh0',d:'hard',s:'math',p:null,q:'A train travels from City A to B at 60 mph and returns at 40 mph. What is the average speed for the round trip?',o:['48 mph','50 mph','52 mph','54 mph'],c:0},
+{id:'mh1',d:'hard',s:'math',p:null,q:'What is the center of the circle x² + y² − 6x + 4y − 12 = 0?',o:['(−3, 2)','(3, −2)','(6, −4)','(−6, 4)'],c:1},
+{id:'mh2',d:'hard',s:'math',p:null,q:'If f(x) = 2x² − 3x + 1, what is f(−2)?',o:['3','11','15','19'],c:2},
+{id:'mh3',d:'hard',s:'math',p:null,q:'The mean of five numbers is 12. Four of them are 8, 10, 14, and 16. What is the fifth?',o:['10','12','14','16'],c:1},
+{id:'mh4',d:'hard',s:'math',p:null,q:'What is the remainder when x³ − 2x² + 3x − 5 is divided by (x − 2)?',o:['−1','0','1','3'],c:2},
+{id:'mh5',d:'hard',s:'math',p:null,q:'For what values of x is (x − 1)(x + 3) < 0?',o:['x < −3 or x > 1','−3 < x < 1','x < 1','x > −3'],c:1},
+{id:'mh6',d:'hard',s:'math',p:null,q:'What are the solutions to the system y = x² − 4 and y = 2x − 1?',o:['(3, 5) only','(−1, −3) only','(3, 5) and (−1, −3)','No real solution'],c:2},
+{id:'mh7',d:'hard',s:'math',p:null,q:'The function h(x) = √(x − 4) is defined for x ≥ 4. If the output of h is used as input for k(x) = x² + 1, what is the minimum value of k(h(x))?',o:['0','1','4','5'],c:1},
+{id:'mh8',d:'hard',s:'math',p:null,q:'Two data sets each have mean 50. Set A has standard deviation 2; Set B has standard deviation 15. Which best describes the difference?',o:["Set A's values are clustered closely around the mean, while Set B's are more spread out.",'Set A has more data points than Set B.','The median of Set A is larger than the median of Set B.',"Set B's values are more likely to equal exactly 50 than Set A's."],c:0},
+{id:'mh9',d:'hard',s:'math',p:null,q:'A circle has radius 9. What is the area of a sector with central angle 80°? (Leave in terms of π)',o:['10π','16π','18π','20π'],c:2},
+{id:'mh10',d:'hard',s:'math',p:null,q:'Pump A fills a pool in 8 hours. Pump B drains the full pool in 12 hours. Both run simultaneously starting with an empty pool. How long to fill it?',o:['12 hours','20 hours','24 hours','30 hours'],c:2},
+{id:'mh11',d:'hard',s:'math',p:null,q:'What is the remainder when 2x³ + x² − 5x + 3 is divided by (x + 2)?',o:['−3','0','1','5'],c:2},
+{id:'mh12',d:'hard',s:'math',p:null,q:'In a right triangle, one angle is 30° and the hypotenuse is 10. What is the length of the side opposite the 30° angle?',o:['5','5√3','10√3 / 2','10'],c:0},
+{id:'mh13',d:'hard',s:'math',p:null,q:'What is the distance between (−1, 4) and (5, −4)?',o:['6','8','10','12'],c:2},
+{id:'mh14',d:'hard',s:'math',p:null,q:'What are the solutions to 2x² + 4x − 6 = 0?',o:['x = 3 and x = −1','x = −3 and x = 1','x = 3 and x = 1','x = −3 and x = −1'],c:1},
+{id:'mh15',d:'hard',s:'math',p:null,q:'If 3^(2x) = 81, what is x?',o:['1','2','3','4'],c:1},
+{id:'mh16',d:'hard',s:'math',p:null,q:'What is the solution set of |3x + 1| > 8?',o:['−3 < x < 7/3','x > 7/3 only','x < −3 or x > 7/3','x < −3 only'],c:2},
+{id:'mh17',d:'hard',s:'math',p:null,q:'A class has 20 students. The 15 boys averaged 80 and the 5 girls averaged 92. What is the class average?',o:['82','83','84','86'],c:1},
+{id:'mh18',d:'hard',s:'math',p:null,q:'What is the solution to (x + 2) / (x − 1) = 3?',o:['x = 1/2','x = 5/2','x = 5','x = 7/2'],c:1}
+];
+
+// ─────────────────────────────────────────
+//  MODULE BUILDER
+//  RW  M1:      easy[0-8]   medium[0-11]   hard[0-5]     = 9+12+6  = 27
+//  RW  M2-hard: easy[9-11]  medium[12-20]  hard[6-20]    = 3+9+15  = 27
+//  RW  M2-easy: easy[12-24] medium[21-29]  hard[21-25]   = 13+9+5  = 27
+//  MATH M1:      easy[0-6]   medium[0-9]    hard[0-4]     = 7+10+5  = 22
+//  MATH M2-hard: easy[7-8]   medium[10-17]  hard[5-16]    = 2+8+12  = 22
+//  MATH M2-easy: easy[9-20]  medium[18-25]  hard[17-18]   = 12+8+2  = 22
+// ─────────────────────────────────────────
+function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+function buildModule(sec,track){
+  if(sec==='rw'){
+    if(track==='m1')      return shuffle([...rw_easy.slice(0,9),   ...rw_medium.slice(0,12),  ...rw_hard.slice(0,6)]);
+    if(track==='m2_hard') return shuffle([...rw_easy.slice(9,12),  ...rw_medium.slice(12,21), ...rw_hard.slice(6,21)]);
+    if(track==='m2_easy') return shuffle([...rw_easy.slice(12,25), ...rw_medium.slice(21,30), ...rw_hard.slice(21,26)]);
+  }
+  if(sec==='math'){
+    if(track==='m1')      return shuffle([...math_easy.slice(0,7),  ...math_medium.slice(0,10),  ...math_hard.slice(0,5)]);
+    if(track==='m2_hard') return shuffle([...math_easy.slice(7,9),  ...math_medium.slice(10,18), ...math_hard.slice(5,17)]);
+    if(track==='m2_easy') return shuffle([...math_easy.slice(9,21), ...math_medium.slice(18,26), ...math_hard.slice(17,19)]);
+  }
+}
+
+// ─────────────────────────────────────────
+//  STATE
+// ─────────────────────────────────────────
+let G={};
+function init(){
+  G={
+    queue:[
+      {sec:'rw',  track:'m1', label:'Reading & Writing · Module 1', time:1920},
+      {sec:'rw',  track:'m2', label:'Reading & Writing · Module 2', time:1920},
+      {sec:'math',track:'m1', label:'Math · Module 1',              time:2100},
+      {sec:'math',track:'m2', label:'Math · Module 2',              time:2100},
+    ],
+    qi:-1, qs:[], idx:0, ans:{}, flags:new Set(),
+    results:[], allQs:[], int:null, tLeft:0, pending:null,
+  };
+}
+function scr(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+
+// ─────────────────────────────────────────
+//  EXAM FLOW
+// ─────────────────────────────────────────
+function startExam(){init();doModule(0);}
+
+function doModule(idx){
+  const e=G.queue[idx];
+  let track=e.track;
+  if(track==='m2'){
+    const m1=G.results.find(r=>r.sec===e.sec&&r.track==='m1');
+    const pct=m1?(m1.correct/m1.total):0;
+    track=pct>=0.5?'m2_hard':'m2_easy';
+    G.queue[idx].rt=track;
+  }
+  G.qi=idx; G.qs=buildModule(e.sec,track); G.idx=0; G.tLeft=e.time;
+  document.getElementById('hdr-sec').innerHTML=`<span style="color:${e.sec==='rw'?'#2ec4b6':'#ffaa2e'}">${e.sec==='rw'?'📖':'🧮'}</span>&nbsp; ${e.label}`;
+  renderQ(); startTimer(); scr('screen-module');
+}
+
+function renderQ(){
+  const q=G.qs[G.idx], tot=G.qs.length, L=['A','B','C','D'];
+  document.getElementById('prog').style.width=((G.idx/tot)*100)+'%';
+  document.getElementById('prog-lbl').textContent=`${G.idx+1} of ${tot}`;
+  document.getElementById('qnum').textContent=`Question ${G.idx+1}`;
+  document.getElementById('qdiff').innerHTML=`<span class="dbadge ${q.d}">${q.d}</span>`;
+  document.getElementById('qpassage').innerHTML=q.p?`<div class="passage"><div class="plbl">Passage</div><div class="ptxt">${q.p}</div></div>`:'';
+  document.getElementById('qtxt').textContent=q.q;
+  document.getElementById('qopts').innerHTML=q.o.map((o,i)=>`<button class="opt${G.ans[q.id]===i?' sel':''}" onclick="pick(${i})"><span class="olbl">${L[i]}</span><span class="otxt">${o}</span></button>`).join('');
+  document.getElementById('dots').innerHTML=G.qs.map((qq,i)=>{let c='dot';if(i===G.idx)c+=' cur';else if(G.ans[qq.id]!==undefined)c+=' ans';if(G.flags.has(qq.id))c+=' flag';return`<div class="${c}" onclick="jump(${i})">${i+1}</div>`;}).join('');
+  const last=G.idx===tot-1;
+  document.getElementById('btnnext').style.display=last?'none':'block';
+  document.getElementById('btnsub').style.display=last?'block':'none';
+  document.getElementById('btnprev').style.display=G.idx>0?'block':'none';
+  const flagged=G.flags.has(q.id);
+  document.getElementById('btnflag').className='btn-flag'+(flagged?' on':'');
+  document.getElementById('btnflag').textContent=flagged?'🚩 Flagged':'🚩 Flag for Review';
+}
+function pick(i){G.ans[G.qs[G.idx].id]=i;renderQ();}
+function toggleFlag(){const id=G.qs[G.idx].id;G.flags.has(id)?G.flags.delete(id):G.flags.add(id);renderQ();}
+function nextQ(){if(G.idx<G.qs.length-1){G.idx++;renderQ();}}
+function prevQ(){if(G.idx>0){G.idx--;renderQ();}}
+function jump(i){G.idx=i;renderQ();}
+function submitModule(){clearInterval(G.int);finish();}
+
+function finish(){
+  const e=G.queue[G.qi], track=e.rt||e.track;
+  let correct=0;const bd={easy:{c:0,t:0},medium:{c:0,t:0},hard:{c:0,t:0}};
+  G.qs.forEach(q=>{bd[q.d].t++;if(G.ans[q.id]===q.c){correct++;bd[q.d].c++;}});
+  const res={sec:e.sec,track,label:e.label,questions:G.qs,correct,total:G.qs.length,bd};
+  G.results.push(res);
+  G.qs.forEach(q=>G.allQs.push({...q,sel:G.ans[q.id],ok:G.ans[q.id]===q.c,mod:e.label}));
+  const ni=G.qi+1,last=ni>=G.queue.length;
+  G.pending={res,ni,last};
+  showBreak();
+}
+
+// ─────────────────────────────────────────
+//  BREAK
+// ─────────────────────────────────────────
+function showBreak(){
+  const{res,ni,last}=G.pending,pct=Math.round((res.correct/res.total)*100);
+  document.getElementById('bicon').textContent=last?'🏁':'☕';
+  document.getElementById('btitle').textContent=last?'All Modules Complete!':'Module Complete';
+  document.getElementById('bsub').textContent=last?'View your full results below.':'Take a breath before the next module.';
+  document.getElementById('bcor').textContent=`${res.correct}/${res.total}`;
+  document.getElementById('bpct').textContent=pct+'%';
+  const badge=document.getElementById('bbadge');
+  if(!last){
+    const nxt=G.queue[ni];
+    if(nxt.track==='m2'){
+      const hard=pct>=50;
+      document.getElementById('btrk').textContent=hard?'🔴 Hard':'🟢 Standard';
+      badge.innerHTML=`<div class="tbadge ${hard?'hard':'easy'}">${hard?'⬆ Scored ≥ 50% — unlocking harder Module 2 for maximum score range':'⬇ Standard difficulty Module 2 — stay focused'}</div>`;
+    }else{document.getElementById('btrk').textContent='—';badge.innerHTML='';}
+    document.getElementById('bbtn').textContent=`Continue → ${nxt.label.split('·')[1].trim()}`;
+  }else{document.getElementById('btrk').textContent='✓';badge.innerHTML='';document.getElementById('bbtn').textContent='View Full Results →';}
+  scr('screen-break');
+}
+function continueExam(){const{ni,last}=G.pending;last?showResults():doModule(ni);}
+
+// ─────────────────────────────────────────
+//  TIMER
+// ─────────────────────────────────────────
+function startTimer(){clearInterval(G.int);tick();G.int=setInterval(()=>{G.tLeft--;tick();if(G.tLeft<=0){clearInterval(G.int);finish();}},1000);}
+function tick(){const m=Math.floor(G.tLeft/60),s=G.tLeft%60,el=document.getElementById('timer');el.textContent=`${m}:${s.toString().padStart(2,'0')}`;el.className='tval'+(G.tLeft<=60?' urgent':G.tLeft<=120?' warn':'');}
+
+// ─────────────────────────────────────────
+//  RESULTS
+// ─────────────────────────────────────────
+function showResults(){
+  clearInterval(G.int);
+  const tot=G.results.reduce((a,r)=>a+r.total,0),cor=G.results.reduce((a,r)=>a+r.correct,0),pct=Math.round((cor/tot)*100);
+  document.getElementById('fscore').textContent=cor;
+  document.getElementById('fdenom').textContent=`out of ${tot} questions`;
+  setTimeout(()=>document.getElementById('pbar').style.width=pct+'%',200);
+  document.getElementById('plbl').textContent=pct+'% correct';
+  ['rw','math'].forEach(sec=>{
+    const rs=G.results.filter(r=>r.sec===sec);
+    const sc=rs.reduce((a,r)=>a+r.correct,0),st=rs.reduce((a,r)=>a+r.total,0);
+    const bd={easy:{c:0,t:0},medium:{c:0,t:0},hard:{c:0,t:0}};
+    rs.forEach(r=>['easy','medium','hard'].forEach(d=>{bd[d].c+=r.bd[d].c;bd[d].t+=r.bd[d].t;}));
+    const trks=rs.map(r=>r.track).join(' + ');
+    document.getElementById(`${sec}-card`).innerHTML=`<div class="rch"><div class="rind ${sec}"></div><div><div class="rname">${sec==='rw'?'Reading & Writing':'Math'}</div><div class="rtrk">Tracks: ${trks}</div></div><div class="rscr">${sc}/${st}</div></div><div class="drows">${['easy','medium','hard'].map(d=>{const p=bd[d].t>0?Math.round((bd[d].c/bd[d].t)*100):0;return`<div class="drow"><span class="dlbl ${d}">${d}</span><div class="dbg"><div class="dfill ${d}" style="width:0%" data-p="${p}"></div></div><span class="dcnt">${bd[d].c}/${bd[d].t}</span></div>`;}).join('')}</div>`;
+  });
+  setTimeout(()=>document.querySelectorAll('.dfill').forEach(el=>el.style.width=el.dataset.p+'%'),400);
+  renderRev('all');
+  scr('screen-results');
+}
+
+let af='all';
+function setF(f,btn){af=f;document.querySelectorAll('.fb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderRev(f);}
+function renderRev(f){
+  const L=['A','B','C','D'];
+  let items=G.allQs;
+  if(f==='wrong')items=items.filter(q=>!q.ok);
+  if(f==='right')items=items.filter(q=>q.ok);
+  if(f==='rw')items=items.filter(q=>q.s==='rw');
+  if(f==='math')items=items.filter(q=>q.s==='math');
+  if(f==='hard')items=items.filter(q=>q.d==='hard');
+  const el=document.getElementById('revlist');
+  if(!items.length){el.innerHTML='<p style="color:var(--muted);font-size:14px;padding:14px 0">No questions match this filter.</p>';return;}
+  el.innerHTML=items.map(q=>{
+    const unans=q.sel===undefined;
+    return`<div class="ritem ${q.ok?'ok':'no'}">
+      <div class="rih"><span>${q.ok?'✅':'❌'}</span><span style="font-size:11px;font-family:Fira Code,monospace;color:var(--muted)">${q.mod}</span><span class="dbadge ${q.d}" style="padding:2px 8px;font-size:9px;margin-bottom:0">${q.d}</span></div>
+      ${q.p?`<div style="font-size:12px;color:var(--muted);font-style:italic;padding:6px 10px;background:var(--surface-2);border-radius:5px;border-left:2px solid var(--gold);margin-bottom:6px">${q.p.substring(0,110)}…</div>`:''}
+      <div class="rqt">${q.q}</div>
+      <div class="rans"><span class="${unans?'ya':(q.ok?'ya ok':'ya')}">Your answer: ${unans?'Not answered':L[q.sel]+'. '+q.o[q.sel]}</span>${!q.ok?`<span class="ca">✓ Correct: ${L[q.c]}. ${q.o[q.c]}</span>`:''}</div>
+    </div>`;
+  }).join('');
+}
+function restart(){init();scr('screen-intro');}
+init();
+</script>
+</body>
+</html>
