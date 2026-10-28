@@ -316,3 +316,150 @@
 @media(max-width:760px){
  .flight-iteration-comparison{grid-template-columns:1fr}
 }
+
+
+/* Final editorial refinements: additive and scoped to the original design system. */
+.home-page .work-card__visual{margin:0;min-width:0;align-self:start}
+.home-page .work-card__visual .work-card__media{width:100%}
+.home-page .work-card__visual figcaption{font-size:var(--step--1);line-height:1.5;color:var(--ink-soft);margin-top:.65rem;max-width:62ch}
+.home-page .work-card{transition:border-color 220ms ease}
+.home-page .work-card:where(:hover,:focus-within){border-top-color:var(--green)}
+.home-page .work-card .visual-media img{transition:transform 260ms ease}
+@media(hover:hover) and (pointer:fine){
+  .home-page .work-card:hover .visual-media img{transform:scale(1.02)}
+  .btn{transition:transform 200ms ease,background-color 200ms ease,border-color 200ms ease}
+  .btn:hover{transform:translateY(-2px)}
+  .project-nav .text-link{transition:transform 200ms ease}
+  .project-nav .text-link:hover{transform:translateX(3px)}
+}
+/* The added adaptive learning evidence uses the same restrained card treatment. */
+.selected-work-pair{display:grid;grid-template-columns:1fr;gap:var(--space-3)}
+.selected-adaptive__tags{font-size:var(--step--1);font-weight:600;color:var(--teal);margin-bottom:var(--space-2)}
+.adaptive-pathway{list-style:none;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.8rem;
+  padding:var(--space-3) 0 0;margin:var(--space-3) 0 0;border-top:1px solid var(--line)}
+.adaptive-pathway li{position:relative;font-size:var(--step--1);font-weight:600;line-height:1.4;
+  padding-right:.85rem;color:var(--navy-700);min-width:0}
+.adaptive-pathway li:not(:last-child)::after{content:"→";position:absolute;right:-.35rem;top:-.1rem;color:var(--teal)}
+@media(max-width:700px){
+  .adaptive-pathway{grid-template-columns:1fr;gap:.6rem}
+  .adaptive-pathway li{padding:0 0 1rem 0}
+  .adaptive-pathway li:not(:last-child)::after{content:"↓";left:0;right:auto;top:auto;bottom:-.32rem}
+}
+/* One closing statement, directly after the About résumé/contact section. */
+.about-final{padding-block:var(--space-5) var(--space-6);border-top:1px solid #25435D}
+.about-final h2{max-width:24ch;font-size:var(--step-3)}
+.about-final p{max-width:57ch;font-size:var(--step-1);color:#AAB7C4}
+.about-final__links{display:flex;align-items:center;flex-wrap:wrap;gap:.9rem var(--space-4);margin-top:var(--space-4)}
+.about-final__links a{color:#E8EEF4;font-weight:600;min-height:44px;display:inline-flex;align-items:center;
+  text-underline-offset:.3em;text-decoration-color:var(--blue-soft)}
+.about-final__links a:hover{color:var(--blue-soft)}
+.work-jump-nav a[aria-current="location"]{color:var(--navy-700);border-bottom-color:var(--green)}
+/* The essential text remains visible; motion only clarifies entrances and progression. */
+@media(prefers-reduced-motion:no-preference){
+  @keyframes portfolio-hero-enter{
+    from{opacity:.15;transform:translateY(13px)}
+    to{opacity:1;transform:translateY(0)}
+  }
+  @keyframes portfolio-panel-enter{
+    from{opacity:.3;transform:translateY(9px)}
+    to{opacity:1;transform:translateY(0)}
+  }
+  html.motion-enabled .home-page .site-header .brand,
+  html.motion-enabled .home-page .hero .eyebrow,
+  html.motion-enabled .home-page .hero h1,
+  html.motion-enabled .home-page .hero .hero__support,
+  html.motion-enabled .home-page .hero .hero__tagline,
+  html.motion-enabled .home-page .hero .actions{
+    animation:portfolio-hero-enter 650ms cubic-bezier(.2,.7,.2,1) both
+  }
+  html.motion-enabled .home-page .site-header .brand{animation-delay:40ms}
+  html.motion-enabled .home-page .hero .eyebrow{animation-delay:110ms}
+  html.motion-enabled .home-page .hero h1{animation-delay:200ms}
+  html.motion-enabled .home-page .hero .hero__support{animation-delay:290ms}
+  html.motion-enabled .home-page .hero .hero__tagline{animation-delay:340ms}
+  html.motion-enabled .home-page .hero .actions{animation-delay:420ms}
+  html.motion-enabled .lens-results:not([hidden]),
+  html.motion-enabled .work-page .role-panel:not([hidden]),
+  html.motion-enabled .work-page .flight-panel:not([hidden]){
+    animation:portfolio-panel-enter 230ms ease-out both
+  }
+  html.motion-enabled .work-page .motion-pending:is(.project-divider,.case-hero){
+    transform:translateY(12px);opacity:.87;
+    transition:transform 480ms ease-out,opacity 480ms ease-out
+  }
+  html.motion-enabled .work-page .motion-pending:is(.project-divider,.case-hero).is-in-view{
+    transform:none;opacity:1
+  }
+  /* Draw the career path green line rather than animating the full text. */
+  html.motion-enabled .home-page .path.motion-pending{
+    position:relative
+  }
+  html.motion-enabled .home-page .path.motion-pending li{border-left-color:transparent}
+  html.motion-enabled .home-page .path.motion-pending::after{
+    content:"";position:absolute;top:0;left:0;bottom:0;width:2px;background:var(--green);
+    transform-origin:top center;transform:scaleY(0);
+    transition:transform 1350ms cubic-bezier(.25,.6,.15,1);
+    pointer-events:none
+  }
+  html.motion-enabled .home-page .path.motion-pending.is-in-view::after{transform:scaleY(1)}
+  html.motion-enabled .home-page .path.motion-pending .path__stage{
+    opacity:.6;transition:opacity 450ms ease
+  }
+  html.motion-enabled .home-page .path.motion-pending.is-in-view .path__stage{opacity:1}
+  html.motion-enabled .home-page .path.motion-pending.is-in-view li:nth-child(2) .path__stage{transition-delay:220ms}
+  html.motion-enabled .home-page .path.motion-pending.is-in-view li:nth-child(3) .path__stage{transition-delay:420ms}
+  html.motion-enabled .home-page .path.motion-pending.is-in-view li:nth-child(4) .path__stage{transition-delay:620ms}
+  html.motion-enabled .home-page .path.motion-pending.is-in-view li:nth-child(5) .path__stage{transition-delay:820ms}
+  html.motion-enabled .home-page .path.motion-pending.is-in-view li:nth-child(6) .path__stage{transition-delay:1020ms}
+  @media(min-width:900px){
+    html.motion-enabled .home-page .path.motion-pending{border-top-color:transparent}
+    html.motion-enabled .home-page .path.motion-pending li{border-left:0}
+    html.motion-enabled .home-page .path.motion-pending::after{
+      top:0;left:0;right:0;bottom:auto;width:100%;height:2px;
+      transform-origin:left center;transform:scaleX(0)
+    }
+    html.motion-enabled .home-page .path.motion-pending.is-in-view::after{transform:scaleX(1)}
+  }
+  /* The process progresses through five steps before the feedback path appears. */
+  html.motion-enabled .approach-page .approach-flow.motion-pending .approach-flow__stages{
+    position:relative;border-top-color:transparent
+  }
+  html.motion-enabled .approach-page .approach-flow.motion-pending .approach-flow__stages::before{
+    content:"";position:absolute;left:0;top:-2px;width:100%;height:2px;
+    background:var(--green);transform-origin:left center;transform:scaleX(0);
+    transition:transform 1250ms ease-out
+  }
+  html.motion-enabled .approach-page .approach-flow.motion-pending.is-in-view .approach-flow__stages::before{transform:scaleX(1)}
+  html.motion-enabled .approach-page .approach-flow.motion-pending .approach-flow__stages li{
+    opacity:.62;transform:translateY(5px);transition:opacity 450ms ease,transform 450ms ease
+  }
+  html.motion-enabled .approach-page .approach-flow.motion-pending.is-in-view li{opacity:1;transform:none}
+  html.motion-enabled .approach-page .approach-flow.motion-pending.is-in-view li:nth-child(1){transition-delay:120ms}
+  html.motion-enabled .approach-page .approach-flow.motion-pending.is-in-view li:nth-child(2){transition-delay:350ms}
+  html.motion-enabled .approach-page .approach-flow.motion-pending.is-in-view li:nth-child(3){transition-delay:590ms}
+  html.motion-enabled .approach-page .approach-flow.motion-pending.is-in-view li:nth-child(4){transition-delay:830ms}
+  html.motion-enabled .approach-page .approach-flow.motion-pending.is-in-view li:nth-child(5){transition-delay:1060ms}
+  html.motion-enabled .approach-page .approach-flow.motion-pending .approach-flow__return{
+    opacity:.4;transform:scaleX(.92);transform-origin:right center;
+    transition:opacity 520ms ease,transform 520ms ease
+  }
+  html.motion-enabled .approach-page .approach-flow.motion-pending.is-in-view .approach-flow__return{
+    opacity:1;transform:none;transition-delay:1450ms
+  }
+  @media(max-width:820px){
+    html.motion-enabled .approach-page .approach-flow.motion-pending .approach-flow__stages{
+      border-left-color:transparent
+    }
+    html.motion-enabled .approach-page .approach-flow.motion-pending .approach-flow__stages::before{
+      top:0;left:-2px;width:2px;height:100%;transform-origin:top center;transform:scaleY(0)
+    }
+    html.motion-enabled .approach-page .approach-flow.motion-pending.is-in-view .approach-flow__stages::before{transform:scaleY(1)}
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .home-page .work-card,.home-page .work-card .visual-media img,.btn,.project-nav .text-link{
+    animation:none!important;transition:none!important;transform:none!important
+  }
+  .lens-results,.role-panel,.flight-panel,.approach-flow,.path{animation:none!important;transition:none!important}
+}
