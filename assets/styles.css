@@ -1008,3 +1008,86 @@
 @media(max-width:899px){
   .work-page #lumavi #panel-parent{grid-template-columns:minmax(0,1fr)}
 }
+
+/* Selected Work: curated evidence cards with clear role and outcome hierarchy. */
+.work-page #selected-work .case-hero .lede{max-width:70ch}
+.work-page #selected-work .selected-grid{gap:clamp(1.25rem,2.8vw,2rem);align-items:stretch}
+.work-page #selected-work .selected-grid>.card,
+.work-page #selected-work .selected-design-card{
+  min-width:0;
+  padding:clamp(1.75rem,2.6vw,2rem);
+}
+.work-page #selected-work .selected-grid>.card h3,
+.work-page #selected-work .selected-design-card h3{
+  font-size:clamp(1.2rem,1.55vw,1.5rem);
+  line-height:1.28;
+  margin-bottom:1.4rem;
+}
+.work-page #selected-work .selected-grid>.card h3::after,
+.work-page #selected-work .selected-design-card h3::after{
+  content:"";
+  display:block;
+  height:3px;
+  width:50px;
+  background:var(--blue);
+  margin-top:.9rem;
+  border-radius:2px;
+}
+.work-page #selected-work .role-facts{gap:1.2rem}
+.work-page #selected-work .role-facts>div{padding-top:1rem}
+.work-page #selected-work .role-facts dt{
+  color:var(--teal);
+  font-weight:700;
+  letter-spacing:.075em;
+}
+.work-page #selected-work .role-facts dd{margin-top:.35rem;line-height:1.55}
+.work-page #selected-work .selected-work-pair{gap:var(--space-3)}
+.work-page #selected-work .selected-adaptive{
+  border-top:3px solid var(--blue);
+  padding:clamp(1.75rem,3vw,2.25rem);
+}
+.work-page #selected-work .selected-adaptive h3{
+  font-size:clamp(1.3rem,1.8vw,1.65rem);
+  margin-bottom:.6rem;
+}
+.work-page #selected-work .selected-adaptive__pathway{
+  margin:var(--space-3) 0;
+  padding:clamp(1rem,2.3vw,1.5rem);
+  background:var(--blue-wash);
+  border:1px solid #c5dcef;
+  border-radius:8px;
+}
+.work-page #selected-work .selected-adaptive__pathway .adaptive-pathway{
+  margin:0;
+  padding:0;
+  border-top:0;
+}
+.work-page #selected-work .selected-adaptive__example{
+  padding:1.1rem clamp(1rem,2vw,1.5rem);
+  margin:var(--space-3) 0;
+  border-left:3px solid var(--blue);
+  background:rgba(225,238,252,.6);
+}
+.work-page #selected-work .selected-adaptive__example p{margin:0;max-width:75ch}
+.work-page #selected-work .selected-adaptive__action-wrap{margin:var(--space-3) 0 0}
+.work-page #selected-work .selected-adaptive__action{width:auto;max-width:100%;white-space:normal;text-align:center}
+.work-page #selected-work .selected-supporting{
+  padding:1.45rem clamp(1.5rem,2.5vw,2rem);
+  border-left:3px solid var(--teal);
+  background:var(--paper);
+}
+.work-page #selected-work .selected-supporting h3{
+  font-size:var(--step-1);
+  margin-bottom:.55rem;
+}
+.work-page #selected-work .selected-supporting p{color:var(--ink-soft);margin-bottom:0}
+.work-page #selected-work .selected-design-grid{display:grid;grid-template-columns:minmax(0,1fr)}
+.work-page #selected-work .selected-design-card{width:100%}
+.work-page #selected-work .selected-design-card .role-facts{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:1.25rem 2rem;
+}
+@media(max-width:760px){
+  .work-page #selected-work .selected-design-card .role-facts{grid-template-columns:minmax(0,1fr)}
+}
