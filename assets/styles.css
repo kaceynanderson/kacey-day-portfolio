@@ -873,3 +873,25 @@
 .work-page .training-evidence .figure__frame{background:#fff}
 .work-page .training-evidence .artifact-fullscreen{display:block;width:100%}
 .work-page .training-evidence img{display:block;width:100%;height:auto;object-fit:contain}
+
+/* Program Readiness audiences: separate the blue audience label from its description. */
+.work-page #program-learning-design .eco{
+  display:grid;
+  gap:1rem;
+  margin:0;
+  padding-left:1.3rem;
+}
+.work-page #program-learning-design .eco li{
+  padding-left:.2rem;
+  color:var(--teal);
+  font-weight:600;
+  line-height:1.4;
+}
+.work-page #program-learning-design .eco li small{
+  display:block;
+  margin-top:.3rem;
+  color:var(--ink-soft);
+  font-size:var(--step--1);
+  font-weight:400;
+  line-height:1.55;
+}
