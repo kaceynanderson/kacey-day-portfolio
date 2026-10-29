@@ -895,3 +895,6 @@
   font-weight:400;
   line-height:1.55;
 }
+
+/* Keep the authentic readiness training visible without letting the full screenshot dominate the case study. */
+.work-page #program-learning-design .training-evidence{max-width:700px}
