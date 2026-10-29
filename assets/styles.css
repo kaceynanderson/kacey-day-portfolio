@@ -898,3 +898,104 @@
 
 /* Keep the authentic readiness training visible without letting the full screenshot dominate the case study. */
 .work-page #program-learning-design .training-evidence{max-width:700px}
+
+
+/* Lumavi: evidence-led product showcase hero. Scoped to its Work case study. */
+.work-page #lumavi .lumavi-hero{padding-block:var(--space-3) var(--space-2)}
+.work-page #lumavi .lumavi-hero__panel{
+  overflow:hidden;
+  border:1px solid #264b73;
+  border-radius:12px;
+  background:radial-gradient(circle at 88% 20%,rgba(45,122,211,.32),transparent 42%),linear-gradient(125deg,#071a2b 0%,#102b4a 100%);
+  box-shadow:0 16px 40px rgba(7,26,43,.13);
+}
+.work-page #lumavi .lumavi-hero__layout{
+  display:grid;
+  grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);
+  align-items:center;
+  gap:clamp(1.5rem,3.7vw,3.5rem);
+  padding:clamp(1.75rem,4.6vw,3.7rem);
+}
+.work-page #lumavi .lumavi-hero__copy{min-width:0}
+.work-page #lumavi .lumavi-hero__eyebrow{
+  margin-bottom:var(--space-2);
+  color:#8cc6ff;
+  font-size:.75rem;
+  font-weight:700;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+}
+.work-page #lumavi .lumavi-hero .consolidated-case-title{
+  margin-bottom:var(--space-2);
+  color:#fff;
+  font-size:clamp(2.8rem,5vw,4.75rem);
+}
+.work-page #lumavi .lumavi-hero__statement{
+  margin-bottom:var(--space-2);
+  max-width:19ch;
+  color:#fff;
+  font-family:var(--font-display);
+  font-size:clamp(1.5rem,2.4vw,2.25rem);
+  line-height:1.2;
+  text-wrap:balance;
+}
+.work-page #lumavi .lumavi-hero__description{
+  color:#dce8f5;
+  max-width:42ch;
+  line-height:1.6;
+}
+.work-page #lumavi .lumavi-hero__actions{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:.85rem 1.15rem;
+  margin-top:var(--space-3);
+}
+.work-page #lumavi .lumavi-hero__actions .btn{
+  background:#2382ee;
+  border-color:#2382ee;
+  color:#fff;
+}
+.work-page #lumavi .lumavi-hero__actions .btn:hover{
+  background:#106bcc;
+  border-color:#106bcc;
+}
+.work-page #lumavi .lumavi-hero__actions .btn:focus-visible,
+.work-page #lumavi .lumavi-hero__visual a:focus-visible{
+  outline:3px solid #b8dcff;
+  outline-offset:4px;
+}
+.work-page #lumavi .lumavi-hero__status{
+  color:#c3d6e9;
+  font-size:.8rem;
+  letter-spacing:.035em;
+}
+.work-page #lumavi .lumavi-hero__visual{
+  min-width:0;
+  margin:0;
+  padding:.65rem;
+  border:1px solid rgba(211,233,255,.28);
+  border-radius:10px;
+  background:rgba(215,236,255,.08);
+  box-shadow:0 14px 36px rgba(0,0,0,.22);
+}
+.work-page #lumavi .lumavi-hero__visual a{display:block;border-radius:5px;overflow:hidden;background:#fff}
+.work-page #lumavi .lumavi-hero__visual img{display:block;width:100%;height:auto}
+.work-page #lumavi .lumavi-hero__visual figcaption{
+  margin:.65rem .15rem .1rem;
+  color:#d3e4f5;
+  font-size:.75rem;
+  letter-spacing:.025em;
+}
+.work-page #lumavi .lumavi-hero__tags{
+  margin:var(--space-3) 0 0;
+}
+@media(max-width:860px){
+  .work-page #lumavi .lumavi-hero__layout{grid-template-columns:1fr;gap:var(--space-4)}
+  .work-page #lumavi .lumavi-hero__statement{max-width:25ch}
+  .work-page #lumavi .lumavi-hero__visual{max-width:690px;width:100%;margin-inline:auto}
+}
+@media(max-width:480px){
+  .work-page #lumavi .lumavi-hero__layout{padding:1.4rem}
+  .work-page #lumavi .lumavi-hero__actions .btn{width:100%;justify-content:center}
+}
