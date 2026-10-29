@@ -999,3 +999,12 @@
   .work-page #lumavi .lumavi-hero__layout{padding:1.4rem}
   .work-page #lumavi .lumavi-hero__actions .btn{width:100%;justify-content:center}
 }
+
+/* Lumavi Parent: show the main overview beside the explanation and supporting progress image. */
+.work-page #lumavi #panel-parent .parent-details{display:grid;align-content:start;gap:var(--space-3);min-width:0}
+.work-page #lumavi #panel-parent .parent-details .role-facts{margin:0}
+.work-page #lumavi #panel-parent .parent-overview,
+.work-page #lumavi #panel-parent .parent-progress{margin:0}
+@media(max-width:899px){
+  .work-page #lumavi #panel-parent{grid-template-columns:minmax(0,1fr)}
+}
