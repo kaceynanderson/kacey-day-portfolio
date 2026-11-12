@@ -1101,3 +1101,45 @@
 .pilot-outcomes{margin-block:var(--space-3)}
 .pilot-outcomes .card h3{font-family:var(--font-display);font-variant-numeric:tabular-nums;font-size:clamp(1.65rem,2.8vw,2.35rem);margin-block:.25em}
 .pilot-outcomes .eyebrow{margin-bottom:.25rem}
+
+
+/* Mobile homepage readability polish — November 2026. */
+@media (max-width: 640px) {
+  .home-page .hero {
+    padding-block: 2.3rem 3rem;
+  }
+  .home-page .hero .eyebrow {
+    max-width: 34ch;
+    color: #9BCFFF;
+    font-size: .72rem;
+    line-height: 1.55;
+    letter-spacing: .09em;
+    margin-bottom: 1.25rem;
+  }
+  .home-page .hero h1 {
+    font-size: clamp(2rem, 8.4vw, 2.35rem);
+    line-height: 1.15;
+    letter-spacing: -.025em;
+    max-width: 22ch;
+    margin-bottom: 1.35rem;
+  }
+  .home-page .hero__support {
+    font-size: 1.04rem;
+    line-height: 1.6;
+    color: #D7E2ED;
+    max-width: 43ch;
+  }
+  .home-page .hero__support + .hero__support {
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-top: .85rem;
+  }
+  .home-page .hero__tagline {
+    font-size: 1.05rem;
+    line-height: 1.45;
+    margin-top: 1.5rem;
+  }
+  .home-page .hero .actions {
+    margin-top: 1.7rem;
+  }
+}
